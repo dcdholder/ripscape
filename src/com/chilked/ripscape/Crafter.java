@@ -1,19 +1,22 @@
 package com.chilked.ripscape;
 
+import java.util.*;
+import java.awt.*;
+
 public class Crafter extends WorldObject { //anvils, forges etc.
+	final static String CRAFTER_JSON = "crafter.json";
+	private static final Map<String,CrafterType> allCrafterTypes = new HashMap<String,CrafterType>();
+	
 	private final CrafterType crafterType;
 	
-	private class CrafterType extends WorldObjectType {
-		final static String CRAFTER_JSON = "crafter.json";
-		private static final Map<CrafterType> allCrafterTypes = new HashMap<CrafterType>();
-		
+	private static class CrafterType extends WorldObjectType {
 		private final Skill targetSkill; 
 		
 		private final CraftingTransactionType[] craftingTransactionType;
 		private final boolean requiresTool;
 		private final String  toolName;
 		
-		private class CraftingTransactionType {
+		private static class CraftingTransactionType {
 			private final Item[] inputItems;
 			private final Item[] outputItems;
 			
@@ -30,13 +33,19 @@ public class Crafter extends WorldObject { //anvils, forges etc.
 			}
 		}
 		
-		CrafterType(Skill targetSkill, CraftingTransactionType[] craftingTransactionType,
+		CrafterType(String name, String imageFilename, Skill targetSkill, CraftingTransactionType[] craftingTransactionType,
 		            boolean requiresTool, String toolName) {
 			
+			super(name,imageFilename);
 			this.targetSkill             = targetSkill;
-			this.craftingTransactionType = transactionType;
+			this.craftingTransactionType = craftingTransactionType;
 			this.requiresTool            = requiresTool;
-			this.experience              = experience;
+			this.toolName                = toolName;
 		}
+	}
+	
+	Crafter(Point lowerCorner, Point dimensions, CrafterType crafterType) {
+		super(lowerCorner,dimensions);
+		this.crafterType = crafterType;
 	}
 }

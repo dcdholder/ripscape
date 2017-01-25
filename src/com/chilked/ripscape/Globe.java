@@ -1,11 +1,13 @@
 package com.chilked.ripscape;
 
+import java.awt.*;
+
 public class Globe {
 	static String ROOM_ASCII_PATH;
 
 	private Room[] rooms;
 	
-	class Room {
+	static class Room {
 		final String name;
 	
 		final String   asciiFilename;
@@ -14,7 +16,7 @@ public class Globe {
 		final Portal[]      portals;      //connections to other rooms
 		final WorldObject[] worldObjects; //anvils, ore fields etc.
 	
-		class Portal {
+		static class Portal {
 			Direction exitDirection;
 		
 			Point sourcePoint;
@@ -27,13 +29,29 @@ public class Globe {
 			
 				this.exitDirection = exitDirection;
 				this.sourcePoint   = sourcePoint;
-				this.destRoomName  = destPoint;	
+				this.destRoomName  = destRoomName;
+				this.destPoint     = destPoint;
 			}
 		}
 	
+		private String[] loadAsciiMap(String asciiFilename) {
+			return null; //TODO: make this actually do something
+		}
+		
+		private Portal[] loadPortals(String[] asciiMap) {
+			return null; //TODO: make this actually do something
+		}
+		
+		private WorldObject[] loadWorldObjects(String[] asciiMap) {
+			return null; //TOOD: make this acutally do something
+		}
+		
 		Room(String name, String asciiFilename) {
 			this.name          = name;
 			this.asciiFilename = asciiFilename;
+			this.asciiMap      = loadAsciiMap(asciiFilename);
+			this.portals       = loadPortals(asciiMap);
+			this.worldObjects  = loadWorldObjects(asciiMap);
 			//TODO: how are the other fields derived from these
 		}
 	}

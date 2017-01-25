@@ -1,5 +1,7 @@
 package com.chilked.ripscape;
 
+import java.awt.*;
+
 public class GlobalAddress {
 	String roomName;
 	Point  coord;  

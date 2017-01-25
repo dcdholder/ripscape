@@ -1,29 +1,36 @@
 package com.chilked.ripscape;
 
+import java.util.*;
+
 public class Ammunition extends Item {
+	final static String AMMO_JSON = "ammo.json"; //TODO: set this to something
+	private static final Map<String,AmmunitionType> allAmmunitionTypes = new HashMap<String,AmmunitionType>();
+	
 	private final AmmunitionType ammunitionType;
 	
-	private class AmmunitionType extends ItemType {
-		final static String AMMO_JSON = "ammo.json"; //TODO: set this to something
-		private static final Map<AmmunitionType> allAmmunitionTypes = new HashMap<AmmunitionType>();
+	public enum SubType { arrow, bolt, knife; }
 	
-		public enum Subtype { arrow, bolt, knife; } 
-		
-		private final Subtype subType;
+	public static class AmmunitionType extends ItemType { 
+		private final SubType subType;
 		
 		private final float baseDamage;
 		
-		AmmunitionType getAmmunitionTypeObject() { allAmmunitionTypes.get(); }
-		
-		static { typeLoading(AMMO_JSON, allAmmunitionTypes); }
-		
-		AmmunitionType(String name, int baseValue, SubType subType) {
+		AmmunitionType(String name, int baseValue, SubType subType, float baseDamage) {
 			super(name,baseValue,true);
-			this.subType = subType;
+			this.subType    = subType;
+			this.baseDamage = baseDamage;
 		}
 	}
 	
+	AmmunitionType getAmmunitionTypeObject(String ammunitionTypeName) { return allAmmunitionTypes.get(ammunitionTypeName); }
+	
+	private static void typeLoading(String armourJson, Map<String,AmmunitionType> armourTypesContainer) {
+		
+	}
+	
+	static { typeLoading(AMMO_JSON, allAmmunitionTypes); }
+	
 	Ammunition(String name) {
-		ammunitionType = AmmunitionType.getAmmunitionTypeObject(name);
+		ammunitionType = getAmmunitionTypeObject(name);
 	}
 }

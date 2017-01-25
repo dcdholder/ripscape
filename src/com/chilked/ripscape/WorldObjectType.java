@@ -1,5 +1,7 @@
 package com.chilked.ripscape;
 
+import java.awt.*;
+
 public class WorldObjectType {
 	final private String name;
 
@@ -8,13 +10,14 @@ public class WorldObjectType {
 	
 	public String toString() { return name; }
 	
-	void typeLoading(String JSONFilename, Map<WorldObjectType> worldObjectMap) {
-		//TODO: implement this
+	private Image loadImage(String imageFilename) {
+		return null; //TODO: actually load an image
 	}
 	
 	WorldObjectType(String name, String imageFilename) {
 		this.name          = name;
 		this.imageFilename = imageFilename;
-		//TODO: how are the other fields derived from these
+		this.image         = loadImage(imageFilename);
+		//TODO: how is the image field derived from these
 	}
 }

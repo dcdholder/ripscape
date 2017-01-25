@@ -1,21 +1,23 @@
 package com.chilked.ripscape;
 
+import java.util.*;
+
 public class PC {
+	Skillset  skillset  = new Skillset();
 	Inventory inventory = new Inventory();
 	Equipment equipment = new Equipment();
-	Inventory inventory = new Inventory();
 
 	class Skillset {
 		Map<Skill,Integer> skills = new HashMap<Skill, Integer>();
 		
-		Skillset {
-			skills.put(Skill.Mining,1);
-			skills.put(Skill.Smithing,1);
+		Skillset() {
+			skills.put(Skill.mining,1);
+			skills.put(Skill.smithing,1);
 		}
 	}
 
 	class Inventory {
-		static int capacity = 28;
+		static final int capacity = 28;
 		Item[] items = new Item[capacity];
 		
 		void add(Item newItem) {
@@ -33,14 +35,14 @@ public class PC {
 	}
 	
 	class Equipment {
-		Map<ArmourSlot,Armour> armourSlots = new HashMap<ArmourSlot, Integer>();
+		Map<ArmourSlot,Armour> armourSlots = new HashMap<ArmourSlot,Armour>();
 		Weapon weaponSlot;
 		
 		//methods return previously-equipped weapons and armour
 		//be prepared for nulls
 		Armour equipArmour(Armour armour) {
 			Armour prevArmour = armourSlots.get(armour.getArmourSlot());
-			armourSlots.put(armourSlot,armour);
+			armourSlots.put(armour.getArmourSlot(),armour);
 			
 			return prevArmour;
 		}
@@ -71,14 +73,14 @@ public class PC {
 		} else if(inventory.items[inventoryIndex] instanceof Weapon) {
 			equipWeapon(inventoryIndex);
 		} else {
-			throw new IllegalArgumentException("Cannot equip non-equippable item.")
+			throw new IllegalArgumentException("Cannot equip non-equippable item.");
 		}
 	}
 	
 	private void equipArmour(int inventoryIndex) {
 		if(inventory.items[inventoryIndex] instanceof Armour) {
-			Item tmpArmour   = equipment.equipArmour(inventory.items[inventoryIndex]);
-			Armour oldArmour = (Armour)tmpArmour;
+			Armour armour    = (Armour)inventory.items[inventoryIndex];
+			Armour oldArmour = equipment.equipArmour(armour);
 		
 			if(oldArmour!=null) {
 				inventory.add(oldArmour);
@@ -88,7 +90,7 @@ public class PC {
 		}
 	}
 	public void removeArmour(ArmourSlot armourSlot) {
-		Armour oldArmour = equipment.removeArmour(ArmourSlot armourSlot);
+		Armour oldArmour = equipment.removeArmour(armourSlot);
 		
 		if(oldArmour!=null) {
 			inventory.add(oldArmour);
@@ -97,8 +99,8 @@ public class PC {
 	
 	private void equipWeapon(int inventoryIndex) {
 		if(inventory.items[inventoryIndex] instanceof Weapon) {
-			Item   tmpWeapon = equipment.equipWeapon(inventory.items[inventoryIndex]);
-			Weapon oldWeapon = (Weapon)tmpWeapon
+			Weapon weapon    = (Weapon)inventory.items[inventoryIndex];
+			Weapon oldWeapon = equipment.equipWeapon(weapon);
 		
 			if(oldWeapon!=null) {
 				inventory.add(oldWeapon);
