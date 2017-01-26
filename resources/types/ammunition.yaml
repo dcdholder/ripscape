@@ -1,0 +1,16 @@
+ammunition:
+	#arrows
+	Bronze Arrow:
+		baseValue:  1
+		subType:    arrow 
+		baseDamage: 1.0
+	Iron Arrow:
+		baseValue:  10
+		subType:    arrow 
+		baseDamage: 2.0
+	Steel Arrow:
+		baseValue:  100
+		subType:    arrow
+		baseDamage: 3.0
+		
+	

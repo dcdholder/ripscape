@@ -1,0 +1,36 @@
+items:
+	#coinage
+	Coin:
+		baseValue: 1
+		stackable: true
+
+	#tools
+	Hammer:
+		baseValue: 1
+		stackable: false
+
+	#ores
+	Tin Ore:
+		baseValue: 1
+		stackable: false
+	Copper Ore:
+		baseValue: 1
+		stackable: false
+	Iron Ore:
+		baseValue: 10
+		stackable: false
+	Coal Ore:
+		baseValue: 100
+		stackable: false
+
+	#bars
+	Bronze Bar:
+		baseValue: 1
+		stackable: false
+	Iron Bar:
+		baseValue: 10
+		stackable: false
+	Steel Bar:
+		baseValue: 100
+		stackable: false
+		

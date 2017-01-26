@@ -1,0 +1,87 @@
+crafters:
+	Anvil:
+		imageFilename: anvil.png
+		targetSkill:   mining
+		requiresTool:  true
+		toolName:      Hammer
+		
+		craftingTransactionType:
+			#daggers
+			bronzeDagger:
+				inputItems:
+					Bronze Bar: 1
+				outputItems:
+					Bronze Dagger: 1
+				minimumLevel: 1
+				experience:   10
+			ironDagger:
+				inputItems:
+					Iron Bar: 1
+				outputItems:
+					Iron Dagger: 1
+				minimumLevel: 10
+				experience:   15
+			steelDagger:
+				inputItems:
+					Steel Bar: 1
+				outputItems:
+					Steel Dagger: 1
+				minimumLevel: 20
+				experience:   20
+					
+			#medium helm
+			bronzeMediumHelm:
+				inputItems:
+					Bronze Bar: 1
+				outputItems:
+					Bronze Medium Helm: 1
+				minimumLevel: 1
+				experience:   10
+			ironMediumHelm:
+				inputItems:
+					Iron Bar: 1
+				outputItems:
+					Iron Medium Helm: 1
+				minimumLevel: 10
+				experience:   15
+			steelMediumHelm:
+				inputItems:
+					Steel Bar: 1
+				ouputItems:
+					Steel Medium Helm: 1
+				minimumLevel: 20
+				experience:   20
+				
+			
+					
+	Forge:
+		imageFilename: forge.png
+		targetSkill:   smithing
+		requiresTool:  false
+		toolName:      none
+		
+		craftingTransactionType:
+			#only bars
+			bronzeBar:
+				inputItems:
+					Tin Ore:    1
+					Copper Ore: 1
+				ouputItems:
+					Bronze Bar: 1
+				minimumLevel: 1
+				experience:   10
+			ironBar:
+				inputItems:
+					Iron Ore: 1
+				outputItems:
+					Iron Bar: 1
+				minimumLevel: 10
+				experience:   15
+			steelBar:
+				inputItems:
+					Coal Ore: 2
+					Iron Ore: 1
+				outputItems:
+					Steel Bar: 1
+				minimumLevel: 20
+				experience:   20
