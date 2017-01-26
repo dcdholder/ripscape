@@ -5,8 +5,8 @@ import java.util.*;
 public class Armour extends Item {
 	final static String ARMOUR_JSON = "armour.json";
 	private static final Map<String,ArmourType> allArmourTypes = new HashMap<String,ArmourType>();
-
-	private final ArmourType armourType;
+	
+	private final ArmourType armourType; //itemType cast
 	
 	private class ArmourType extends ItemType {
 		private final ArmourSlot armourSlot;
@@ -22,7 +22,7 @@ public class Armour extends Item {
 	
 	ArmourSlot getArmourSlot() { return armourType.armourSlot; }
 	
-	ArmourType getArmourTypeObject(String armourTypeName) { return allArmourTypes.get(armourTypeName); }
+	static ArmourType getArmourTypeObject(String armourTypeName) { return allArmourTypes.get(armourTypeName); }
 	
 	private static void typeLoading(String armourJson, Map<String,ArmourType> armourTypesContainer) {
 		
@@ -31,6 +31,7 @@ public class Armour extends Item {
 	static { typeLoading(ARMOUR_JSON, allArmourTypes); }
 	
 	Armour(String name) {
-		armourType = getArmourTypeObject(name);
+		super(getArmourTypeObject(name));
+		this.armourType = (ArmourType)itemType;
 	}
 }

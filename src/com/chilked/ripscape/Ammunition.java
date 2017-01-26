@@ -22,7 +22,7 @@ public class Ammunition extends Item {
 		}
 	}
 	
-	AmmunitionType getAmmunitionTypeObject(String ammunitionTypeName) { return allAmmunitionTypes.get(ammunitionTypeName); }
+	static AmmunitionType getAmmunitionTypeObject(String ammunitionTypeName) { return allAmmunitionTypes.get(ammunitionTypeName); }
 	
 	private static void typeLoading(String armourJson, Map<String,AmmunitionType> armourTypesContainer) {
 		
@@ -31,6 +31,7 @@ public class Ammunition extends Item {
 	static { typeLoading(AMMO_JSON, allAmmunitionTypes); }
 	
 	Ammunition(String name) {
-		ammunitionType = getAmmunitionTypeObject(name);
+		super(getAmmunitionTypeObject(name));
+		this.ammunitionType = (AmmunitionType)itemType;
 	}
 }

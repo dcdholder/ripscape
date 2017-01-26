@@ -17,11 +17,11 @@ public class PC {
 	}
 
 	class Inventory {
-		static final int capacity = 28;
-		Item[] items = new Item[capacity];
+		public static final int CAPACITY = 28;
+		Item[] items = new Item[CAPACITY];
 		
 		void add(Item newItem) {
-			for(int i=0; i<capacity; i++) {
+			for(int i=0; i<CAPACITY; i++) {
 				if(items[i]==null) {
 					items[i] = newItem;
 					return;
@@ -31,7 +31,36 @@ public class PC {
 			throw new IllegalArgumentException("Cannot add item; no more inventory space.");
 		}
 		
-		void remove(int index) { items[index] = null; }
+		Item view(int index) {
+			if(index>=CAPACITY) {
+				throw new NoSuchElementException("Illegal inventory index.");
+			} else {
+				return items[index];  
+			}
+		}
+		
+		Item retrieve(int index) {
+			Item desiredItem = view(index);
+			remove(index);
+			
+			return desiredItem;
+		}
+		
+		void remove(int index) { 
+			items[index] = null; 
+		}
+		
+		List<Integer> retrieveIndices(Item checkItem) {
+			List<Integer> indices = new ArrayList<Integer>();
+			
+			for(int i=0; i<CAPACITY; i++) {
+				if(view(i).getItemType().equals(checkItem.getItemType())) {
+					indices.add(i);
+				}
+			}
+			
+			return indices;
+		}
 	}
 	
 	class Equipment {
@@ -68,7 +97,7 @@ public class PC {
 	}
 	
 	public void equipItem(int inventoryIndex) {
-		if(inventory.items[inventoryIndex] instanceof Armour) {
+		if(inventory.view(inventoryIndex) instanceof Armour) {
 			equipArmour(inventoryIndex);
 		} else if(inventory.items[inventoryIndex] instanceof Weapon) {
 			equipWeapon(inventoryIndex);
@@ -78,8 +107,8 @@ public class PC {
 	}
 	
 	private void equipArmour(int inventoryIndex) {
-		if(inventory.items[inventoryIndex] instanceof Armour) {
-			Armour armour    = (Armour)inventory.items[inventoryIndex];
+		if(inventory.view(inventoryIndex) instanceof Armour) {
+			Armour armour    = (Armour)inventory.retrieve(inventoryIndex);
 			Armour oldArmour = equipment.equipArmour(armour);
 		
 			if(oldArmour!=null) {
@@ -98,8 +127,8 @@ public class PC {
 	}
 	
 	private void equipWeapon(int inventoryIndex) {
-		if(inventory.items[inventoryIndex] instanceof Weapon) {
-			Weapon weapon    = (Weapon)inventory.items[inventoryIndex];
+		if(inventory.view(inventoryIndex) instanceof Weapon) {
+			Weapon weapon    = (Weapon)inventory.retrieve(inventoryIndex);
 			Weapon oldWeapon = equipment.equipWeapon(weapon);
 		
 			if(oldWeapon!=null) {

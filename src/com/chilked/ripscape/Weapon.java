@@ -41,7 +41,7 @@ public class Weapon extends Item {
 		}
 	}
 	
-	WeaponType getWeaponTypeObject(String weaponTypeName) { return allWeaponTypes.get(weaponTypeName); }
+	static WeaponType getWeaponTypeObject(String weaponTypeName) { return allWeaponTypes.get(weaponTypeName); }
 	
 	private static void typeLoading(String armourJson, Map<String,WeaponType> weaponTypesContainer) {
 		
@@ -50,6 +50,7 @@ public class Weapon extends Item {
 	static { typeLoading(WEAPON_JSON, allWeaponTypes); }
 	
 	Weapon(String name) {
-		weaponType = getWeaponTypeObject(name);
+		super(getWeaponTypeObject(name));
+		this.weaponType = (WeaponType)itemType;
 	}
 }
