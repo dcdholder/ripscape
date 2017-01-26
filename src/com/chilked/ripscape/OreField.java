@@ -15,15 +15,17 @@ public class OreField extends WorldObject {
 		private final float baseMineTime;
 		private final float respawnTime;
 		private final int   minimumMiningLevel;
+		private final int   experience;
 		
 		OreFieldType(String name, String imageFilename, String oreTypeName, float baseMineTime, float respawnTime, 
-		             int minimumMiningLevel) {
+		             int minimumMiningLevel, int experience) {
 
 			super(name, imageFilename);
 			this.oreType            = Item.getItemTypeObject(oreTypeName);
 			this.baseMineTime       = baseMineTime;
 			this.respawnTime        = respawnTime;
 			this.minimumMiningLevel = minimumMiningLevel;
+			this.experience         = experience;
 		}
 	}
 	
