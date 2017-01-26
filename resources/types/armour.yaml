@@ -1,28 +1,31 @@
-armour:
-	#medium helm
-	Bronze Medium Helm:
-		baseValue:   1
-		armourSlot:  head
-		baseDefense: 1.0
-	Iron Medium Helm:
-		baseValue:   10
-		armourSlot:  head
-		baseDefense: 2.0
-	Steel Medium Helm:
-		baseValue:   100
-		armourSlot:  head
-		baseDefense: 3.0
-		
-	#full helm
-	Bronze Full Helm:
-		baseValue:   2
-		armourSlot:  head
-		baseDefense: 1.5
-	Iron Full Helm:
-		baseValue:   20
-		armourSlot:  head
-		baseDefense: 3
-	Steel Full Helm:
-		baseValue:   200
-		armourSlot:  head
-		baseDefense: 4.5
+#medium helm
+- name:        Bronze Medium Helm
+  baseValue:   1
+  armourSlot:  head
+  baseDefense: 1.0
+  
+- name:        Iron Medium Helm
+  baseValue:   10
+  armourSlot:  head
+  baseDefense: 2.0
+  
+- name:        Steel Medium Helm
+  baseValue:   100
+  armourSlot:  head
+  baseDefense: 3.0
+  
+#full helm
+- name:        Bronze Full Helm
+  baseValue:   2
+  armourSlot:  head
+  baseDefense: 1.5
+
+- name:        Iron Full Helm
+  baseValue:   20
+  armourSlot:  head
+  baseDefense: 3
+  
+- name:        Steel Full Helm
+  baseValue:   200
+  armourSlot:  head
+  baseDefense: 4.5

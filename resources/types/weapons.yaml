@@ -1,64 +1,67 @@
-weapons:
-	#daggers
-	Bronze Dagger:
-		baseValue:         1
-		subType:           dagger
-		damageType:        stab
-		handedness:        one
-		expendsAmmunition: false
-		ammunitionType:    none
-		reach:             1.0
-		baseDamage:        1.0
-		attackSpeed:       1.0
-	Iron Dagger:
-		baseValue:         10
-		subType:           dagger
-		damageType:        stab
-		handedness:        one
-		expendsAmmunition: false
-		ammunitionType:    none
-		reach:             1.0
-		baseDamage:        2.0
-		attackSpeed:       1.0
-	Steel Dagger:
-		baseValue:         100
-		subType:           dagger
-		damageType:        stab
-		handedness:        one
-		expendsAmmunition: false
-		ammunitionType:    none
-		reach:             1.0
-		baseDamage:        3.0
-		attackSpeed:       1.0
-	
-	#picks
-	Bronze Pick:
-		baseValue:         5
-		subType:           pick
-		damageType:        crush
-		handedness:        two
-		expendsAmmunition: false
-		ammunitionType:    none
-		reach:             1.0
-		baseDamage:        0.5
-		attackSpeed:       0.5
-	Iron Pick:
-		baseValue:         50
-		subType:           pick
-		damageType:        crush
-		handedness:        two
-		expendsAmmunition: false
-		ammunitionType:    none
-		reach:             1.0
-		baseDamage:        1.0
-		attackSpeed:       0.5
-	Steel Pick:
-		baseValue:         500
-		subType:           pick
-		damageType:        crush
-		handedness:        two
-		expendsAmmunition: false
-		ammunitionType:    none
-		reach:             1.5
-		baseDamage:        1.5
-		attackSpeed:       0.5
+#daggers
+- name:              Bronze Dagger
+  baseValue:         1
+  subType:           dagger
+  damageType:        stab
+  handedness:        one
+  expendsAmmunition: false
+  ammunitionType:    none
+  reach:             1.0
+  baseDamage:        1.0
+  attackSpeed:       1.0
+  
+- name:              Iron Dagger
+  baseValue:         10
+  subType:           dagger
+  damageType:        stab
+  handedness:        one
+  expendsAmmunition: false
+  ammunitionType:    none
+  reach:             1.0
+  baseDamage:        2.0
+  attackSpeed:       1.0
+
+- name:              Steel Dagger
+  baseValue:         100
+  subType:           dagger
+  damageType:        stab
+  handedness:        one
+  expendsAmmunition: false
+  ammunitionType:    none
+  reach:             1.0
+  baseDamage:        3.0
+  attackSpeed:       1.0
+
+#picks
+- name:              Bronze Pick
+  baseValue:         5
+  subType:           pick
+  damageType:        crush
+  handedness:        two
+  expendsAmmunition: false
+  ammunitionType:    none
+  reach:             1.0
+  baseDamage:        0.5
+  attackSpeed:       0.5
+
+- name:              Iron Pick
+  baseValue:         50
+  subType:           pick
+  damageType:        crush
+  handedness:        two
+  expendsAmmunition: false
+  ammunitionType:    none
+  reach:             1.0
+  baseDamage:        1.0
+  attackSpeed:       0.5
+
+- name:              Steel Pick
+  baseValue:         500
+  subType:           pick
+  damageType:        crush
+  handedness:        two
+  expendsAmmunition: false
+  ammunitionType:    none
+  reach:             1.5
+  baseDamage:        1.5
+  attackSpeed:       0.5

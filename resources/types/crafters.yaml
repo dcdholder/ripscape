@@ -1,87 +1,129 @@
-crafters:
-	Anvil:
-		imageFilename: anvil.png
-		targetSkill:   mining
-		requiresTool:  true
-		toolName:      Hammer
-		
-		craftingTransactionType:
-			#daggers
-			bronzeDagger:
-				inputItems:
-					Bronze Bar: 1
-				outputItems:
-					Bronze Dagger: 1
-				minimumLevel: 1
-				experience:   10
-			ironDagger:
-				inputItems:
-					Iron Bar: 1
-				outputItems:
-					Iron Dagger: 1
-				minimumLevel: 10
-				experience:   15
-			steelDagger:
-				inputItems:
-					Steel Bar: 1
-				outputItems:
-					Steel Dagger: 1
-				minimumLevel: 20
-				experience:   20
-					
-			#medium helm
-			bronzeMediumHelm:
-				inputItems:
-					Bronze Bar: 1
-				outputItems:
-					Bronze Medium Helm: 1
-				minimumLevel: 1
-				experience:   10
-			ironMediumHelm:
-				inputItems:
-					Iron Bar: 1
-				outputItems:
-					Iron Medium Helm: 1
-				minimumLevel: 10
-				experience:   15
-			steelMediumHelm:
-				inputItems:
-					Steel Bar: 1
-				ouputItems:
-					Steel Medium Helm: 1
-				minimumLevel: 20
-				experience:   20
-				
-			
-					
-	Forge:
-		imageFilename: forge.png
-		targetSkill:   smithing
-		requiresTool:  false
-		toolName:      none
-		
-		craftingTransactionType:
-			#only bars
-			bronzeBar:
-				inputItems:
-					Tin Ore:    1
-					Copper Ore: 1
-				ouputItems:
-					Bronze Bar: 1
-				minimumLevel: 1
-				experience:   10
-			ironBar:
-				inputItems:
-					Iron Ore: 1
-				outputItems:
-					Iron Bar: 1
-				minimumLevel: 10
-				experience:   15
-			steelBar:
-				inputItems:
-					Coal Ore: 2
-					Iron Ore: 1
-				outputItems:
-					Steel Bar: 1
-				minimumLevel: 20
-				experience:   20
+- name:          Anvil
+  imageFilename: anvil.png
+  targetSkill:   smithing
+  requiresTool:  true
+  toolName:      Hammer
+  
+  transaction:
+    #daggers
+    - inputItems:
+        - name: Bronze Bar
+          num:  1
+      outputItems:
+        - name: Bronze Dagger
+          num:  1
+      minimumLevel: 1
+      experience:   10
+
+    - inputItems:
+        - name: Iron Bar
+          num:  1
+      outputItems:
+        - name: Iron Dagger
+          num:  1
+      minimumLevel: 10
+      experience:   15
+      
+    - inputItems:
+        - name: Steel Bar
+          num:  1
+      outputItems:
+        - name: Steel Dagger
+          num:  1
+      minimumLevel: 20
+      experience:   20
+          
+    #medium helm
+    - inputItems:
+        - name: Bronze Bar
+          num:  1
+      outputItems:
+        - name: Bronze Dagger
+          num:  1
+      minimumLevel: 1
+      experience:   10
+      
+    - inputItems:
+        - name: Iron Bar
+          num:  1
+      outputItems:
+        - name: Iron Medium Helm
+          num:  1
+      minimumLevel: 10
+      experience:   15
+      
+    - inputItems:
+        - name: Steel Bar
+          num:  1
+      outputItems:
+        - name: Steel Medium Helm
+          num:  1
+      minimumLevel: 20
+      experience:   20
+      
+    #full helm
+    - inputItems:
+        - name: Bronze Bar
+          num:  2
+      outputItems:
+        - name: Bronze Dagger
+          num:  1
+      minimumLevel: 1
+      experience:   20
+      
+    - inputItems:
+        - name: Iron Bar
+          num:  2
+      outputItems:
+        - name: Iron Medium Helm
+          num:  1
+      minimumLevel: 10
+      experience:   30
+      
+    - inputItems:
+        - name: Steel Bar
+          num:  2
+      outputItems:
+        - name: Steel Medium Helm
+          num:  1
+      minimumLevel: 20
+      experience:   40
+          
+- name:          Forge
+  imageFilename: forge.png
+  targetSkill:   smithing
+  requiresTool:  false
+  toolName:      none
+    
+  transaction:
+    #only bars
+    - inputItems:
+        - name: Tin Ore
+          num:  1
+        - name: Copper Ore
+          num:  1
+      outputItems:
+        - name: Bronze Bar
+          num:  1
+      minimumLevel: 1
+      experience:   10
+
+    - inputItems:
+        - name: Iron Ore
+          num:  1
+      outputItems:
+        - name: Iron Bar
+          num:  1
+      minimumLevel: 10
+      experience:   15
+      
+    - inputItems:
+        - name: Iron Ore
+          num:  1
+        - name: Coal Ore
+          num:  2
+      outputItems:
+        - name: Steel Bar
+          num:  1
+      minimumLevel: 20
+      experience:   20
