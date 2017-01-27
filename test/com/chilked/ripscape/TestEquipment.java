@@ -93,7 +93,7 @@ public class TestEquipment {
 	void testRemoveArmourSlotEmpty() {
 		PC pc = initializeInventory();
 		
-		pc.removeArmour(ArmourSlot.head); //confirm that this throws an exception
+		pc.removeArmour(Armour.ArmourType.ArmourSlot.head); //confirm that this throws an exception
 	}
 	
 	@Test
@@ -101,7 +101,7 @@ public class TestEquipment {
 		PC pc = initializeInventory();
 		
 		pc.equipItem(3);
-		pc.removeArmour(ArmourSlot.head);
+		pc.removeArmour(Armour.ArmourType.ArmourSlot.head);
 	}
 	
 	@Test
@@ -110,7 +110,7 @@ public class TestEquipment {
 		
 		pc.equipItem(3);
 		pc.inventory.add(new Weapon("Bronze Dagger"));
-		pc.removeArmour(ArmourSlot.head); //confirm that this throws an exception
+		pc.removeArmour(Armour.ArmourType.ArmourSlot.head); //confirm that this throws an exception
 	}
 	
 	@Test

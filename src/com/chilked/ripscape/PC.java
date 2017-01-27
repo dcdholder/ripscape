@@ -2,13 +2,17 @@ package com.chilked.ripscape;
 
 import java.util.*;
 
+import com.chilked.ripscape.Armour.ArmourType;
+
 public class PC {
 	Skillset  skillset  = new Skillset();
 	Inventory inventory = new Inventory();
 	Equipment equipment = new Equipment();
 
-	class Skillset {
+	static class Skillset {
 		Map<Skill,Integer> skills = new HashMap<Skill, Integer>();
+		
+		public enum Skill { mining, smithing; }
 		
 		Skillset() {
 			skills.put(Skill.mining,1);
@@ -64,7 +68,7 @@ public class PC {
 	}
 	
 	class Equipment {
-		Map<ArmourSlot,Armour> armourSlots = new HashMap<ArmourSlot,Armour>();
+		Map<ArmourType.ArmourSlot,Armour> armourSlots = new HashMap<ArmourType.ArmourSlot,Armour>();
 		Weapon weaponSlot;
 		
 		//methods return previously-equipped weapons and armour
@@ -75,7 +79,7 @@ public class PC {
 			
 			return prevArmour;
 		}
-		Armour removeArmour(ArmourSlot armourSlot) {
+		Armour removeArmour(ArmourType.ArmourSlot armourSlot) {
 			Armour prevArmour = armourSlots.get(armourSlot);
 			armourSlots.remove(armourSlot);
 			
@@ -118,7 +122,7 @@ public class PC {
 			throw new IllegalArgumentException("Cannot equip non-armour as armour.");
 		}
 	}
-	public void removeArmour(ArmourSlot armourSlot) {
+	public void removeArmour(ArmourType.ArmourSlot armourSlot) {
 		Armour oldArmour = equipment.removeArmour(armourSlot);
 		
 		if(oldArmour!=null) {

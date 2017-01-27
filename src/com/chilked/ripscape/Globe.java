@@ -7,7 +7,19 @@ public class Globe {
 
 	private Room[] rooms;
 	
-	static class Room {
+	public enum Direction { up, down, right, left; }
+	
+	public static class GlobalAddress {
+		String roomName;
+		Point  coord;  
+		
+		GlobalAddress(String roomName, Point coord) {
+			this.roomName = roomName;
+			this.coord    = coord;
+		}
+	}
+	
+	private static class Room {
 		final String name;
 	
 		final String   asciiFilename;
