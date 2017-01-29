@@ -189,8 +189,4 @@ public class PC {
 			inventory.add(oldWeapon);
 		}
 	}
-	
-	PC(GlobalAddress globalAddress, Hitbox hitbox) {
-		this.globalAddress = globalAddress;
-	}
 }
