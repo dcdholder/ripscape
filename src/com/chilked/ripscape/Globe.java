@@ -7,9 +7,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
+import java.util.*;
 
 import org.yaml.snakeyaml.Yaml;
 
@@ -147,15 +150,22 @@ public class Globe {
 			private static final char defFloorChar;
 			
 			static private String[] loadRoomText(String roomFilename) {
-				Scanner      scanner = new Scanner(new File(roomFilename));
-				List<String> lines   = new ArrayList<String>();
-				while(scanner.hasNextLine()) {
-					lines.add(scanner.nextLine());
+				try {
+					Scanner scanner = new Scanner(new File(roomFilename));
+					List<String> lines   = new ArrayList<String>();
+					while(scanner.hasNextLine()) {
+						lines.add(scanner.nextLine());
+					}
+
+					String[] linesArr = lines.toArray(new String[0]);
+
+					scanner.close();
+					
+					return preprocessRoomText(linesArr);
+				} catch(FileNotFoundException e) {
+					e.printStackTrace();
+					throw new IllegalArgumentException("Could not load room art.");
 				}
-
-				String[] linesArr = lines.toArray(new String[0]);
-
-				return preprocessRoomText(linesArr);
 			}
 			
 			static String[] deepCopy(String[] inputStrings) {
@@ -179,30 +189,63 @@ public class Globe {
 				return lines;
 			}
 
+			static void checkPoint(char[][] charSquare, Set<Point> checkedPoints, Point point) {
+				checkedPoints.add(point);
+
+				if(!charIsWall(charSquare[point.x][point.y])) {
+					Point upperPoint = new Point(point.x,point.y+1);
+					Point lowerPoint = new Point(point.x,point.y-1);
+					Point rightPoint = new Point(point.x+1,point.y);
+					Point leftPoint  = new Point(point.x-1,point.y);
+				
+					charSquare[point.x][point.y] = defFloorChar;
+					
+					if(!checkedPoints.contains(upperPoint) && upperPoint.getY()<charSquare.length) {
+						checkPoint(charSquare,checkedPoints,upperPoint);
+					} 
+					if(!checkedPoints.contains(lowerPoint) && lowerPoint.getY()>=0) {
+						checkPoint(charSquare,checkedPoints,lowerPoint);
+					}
+					if(!checkedPoints.contains(rightPoint) && rightPoint.getX()<charSquare[rightPoint.y].length) {
+						checkPoint(charSquare,checkedPoints,rightPoint);
+					}
+					if(!checkedPoints.contains(leftPoint) && leftPoint.getX()>=0) {
+						checkPoint(charSquare,checkedPoints,leftPoint);
+					}
+				}
+			}
+
 			static String[] replaceEmptyWithFloors(String[] inputLines) {
 				String[] lines = deepCopy(inputLines);
-					
-				//replace spaces with floor characters
-				//this will work as long as walls are spaced at least one character apart
+				
+				//convert String array into double char array
+				char[][] charSquare = new char[lines.length][];
 				for(int j=0;j<lines.length;j++) {
 					char[] lineChars = lines[j].toCharArray(); //does not include any newlines
-
-					boolean fillOn         = false;
-					boolean prevCharIsWall = false;
-					for(int i=0; i<lineChars.length; i++) {
-						if(charIsWall(lineChars[i]) && !prevCharIsWall()) {
-							fillOn         = !fillOn; //toggles on reaching first wall char after non-wall chars
-							prevCharIsWall = true;
-						} else if(!charIsWall(lineChars[i])) {
-							prevCharIsWall = false;
-							if(charIsEmpty(lineChars[i]) && fillOn) { //only triggers when space is enclosed by wall chars
-								lineChars[i] = defFloorChar;
-							}
+					charSquare[j] = lineChars;
+				}
+				
+				//find the first pair of non-consecutive wall chars on one line, then run the pixel fill algo
+				boolean foundPoint = false;
+				outerloop:
+				for(int j=0; j<charSquare.length; j++) {
+					char[]  charLine   = charSquare[j];
+					boolean firstFound = false;
+					for(int i=0; i<charLine.length; i++) {
+						if(charIsWall(charLine[i]) && !firstFound) {
+							firstFound = true;
+						} else if(charIsWall(charLine[i]) && firstFound) {
+							Point point = new Point(i,j);
+							foundPoint  = true;
+							checkPoint(charSquare, new HashSet<Point>(), point);
+							
+							break outerloop;
 						}
 					}
+				}
 				
-					//if there are empty spaces postfixed to a line, 
-					lines[j] = new String(lineChars);
+				if(!foundPoint) {
+					throw new IllegalStateException("Could not find a pair of wall characters for pixel fill.");
 				}
 			}
 
