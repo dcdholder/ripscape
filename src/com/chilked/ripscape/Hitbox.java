@@ -14,7 +14,33 @@ public class Hitbox {
 	Point2D.Double getUpperRight() { return upperRight; }
 	Point2D.Double getLowerRight() { return lowerRight; }
 	
-	public boolean reaches(Double distance, Hitbox hitbox) {
+	public boolean partiallyEnclosed(Hitbox hitbox) {
+		if(enclosed(hitbox.upperLeft) || enclosed(hitbox.upperRight) || enclosed(hitbox.lowerLeft) || enclosed(hitbox.lowerRight)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public boolean totallyEnclosed(Hitbox hitbox) {
+		if(enclosed(hitbox.upperLeft) && enclosed(hitbox.upperRight) && enclosed(hitbox.lowerLeft) && enclosed(hitbox.lowerRight)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public boolean enclosed(Point2D.Double point) {
+		if(lowerLeft.getX()<point.getX()&&lowerRight.getX()>point.getX()) {
+			if(lowerLeft.getY()<point.getY()&&upperLeft.getY()<point.getY()) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	public boolean withinDistance(Double distance, Hitbox hitbox) {
 		if(distance(hitbox)<distance) {
 			return true;
 		} else {
@@ -22,12 +48,21 @@ public class Hitbox {
 		}
 	}
 	
-	public boolean reaches(Double distance, Point2D.Double point) {
+	public boolean withinDistance(Double distance, Point2D.Double point) {
 		if(distance(point)<distance) {
 			return true;
 		} else {
 			return false;
 		}
+	}
+	
+	private double internalDistance(Point2D.Double point) {
+		double distLeft   = point.getX()-lowerLeft.getX();
+		double distRight  = lowerRight.getX()-point.getX();
+		double distBottom = point.getY()-lowerRight.getY();
+		double distTop    = upperRight.getY()-point.getY();
+		
+		return Math.min(Math.min(distLeft,distRight),Math.min(distTop,distBottom));
 	}
 	
 	public double distance(Hitbox hitbox) {
@@ -36,7 +71,11 @@ public class Hitbox {
 		double lowerLeftDistance  = distance(getLowerLeft());
 		double lowerRightDistance = distance(getLowerRight());
 		
-		return Math.min(Math.min(upperLeftDistance, upperRightDistance), Math.min(lowerLeftDistance, lowerRightDistance));
+		if(!partiallyEnclosed(hitbox)) {
+			return Math.min(Math.min(upperLeftDistance, upperRightDistance), Math.min(lowerLeftDistance, lowerRightDistance));
+		} else {
+			return 0.0;
+		}
 	}
 	
 	public double distance(Point2D.Double point) {
@@ -61,10 +100,14 @@ public class Hitbox {
 				return point.y - upperLeft.y;
 			} else if(point.y<lowerLeft.y) {
 				return lowerLeft.y - point.y;
-			} else {
-				return -1.0; //no precise distances yet if inside the hitbox
+			} else { //you're inside the hitbox!
+				return internalDistance(point);
 			}
 		}
+	}
+	
+	Hitbox(Point lowerCorner, Point dimensions) { //lowercorner can either be float-valued or integral
+		this(new Point2D.Double((double)lowerCorner.getX(),(double)lowerCorner.getY()), dimensions);
 	}
 	
 	Hitbox(Point2D.Double lowerCorner, Point dimensions) { //dimensions MUST map to an integer

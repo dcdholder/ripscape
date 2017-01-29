@@ -1,6 +1,7 @@
 package com.chilked.ripscape;
 
 import java.awt.*;
+import java.awt.geom.Point2D;
 
 public class Globe {
 	static String ROOM_ASCII_PATH;
@@ -11,9 +12,34 @@ public class Globe {
 	
 	public static class GlobalAddress {
 		String roomName;
-		Point  coord;  
+		Point  coord;
 		
 		GlobalAddress(String roomName, Point coord) {
+			this.roomName = roomName;
+			this.coord    = coord;
+		}
+	}
+	
+	public static class GlobalAddress2D {
+		String  roomName;
+		Point2D coord;
+		
+		String  getRoomName() { return roomName; }
+		Point2D getCoord() { return coord; }
+		
+		boolean withinDistance(float radius, GlobalAddress2D otherAddress) {
+			if(!roomName.equals(otherAddress.getRoomName())) {
+				return false;
+			} else {
+				if(coord.distance(otherAddress.getCoord()) < radius) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+		}
+		
+		GlobalAddress2D(String roomName, Point2D coord) {
 			this.roomName = roomName;
 			this.coord    = coord;
 		}
@@ -55,7 +81,7 @@ public class Globe {
 		}
 		
 		private WorldObject[] loadWorldObjects(String[] asciiMap) {
-			return null; //TOOD: make this acutally do something
+			return null; //TODO: make this actually do something
 		}
 		
 		Room(String name, String asciiFilename) {

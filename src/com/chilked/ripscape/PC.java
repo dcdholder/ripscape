@@ -3,20 +3,45 @@ package com.chilked.ripscape;
 import java.util.*;
 
 import com.chilked.ripscape.Armour.ArmourType;
+import com.chilked.ripscape.Globe.GlobalAddress;
 
 public class PC {
 	Skillset  skillset  = new Skillset();
 	Inventory inventory = new Inventory();
 	Equipment equipment = new Equipment();
-
+	GlobalAddress globalAddress;
+	Hitbox hitbox;
+	
 	static class Skillset {
-		Map<Skill,Integer> skills = new HashMap<Skill, Integer>();
+		private static int MAX_LEVEL = 99;
+		private static Map<Integer,Integer> minExperienceLevel = new HashMap<Integer,Integer>();
+		
+		private Map<Skill,Integer> level      = new HashMap<Skill,Integer>();
+		private Map<Skill,Integer> experience = new HashMap<Skill,Integer>();
 		
 		public enum Skill { mining, smithing; }
 		
+		int getLevel(Skill skill)      { return experience.get(skill); }
+		int getExperience(Skill skill) { return level.get(skill); }
+
+		void addExperience(Skill skill, int addExperience) {
+			int newExperience = experience.get(skill) + addExperience;
+			experience.put(skill,newExperience);
+			
+			int currentLevel = level.get(skill);
+			if(newExperience > minExperienceLevel.get(currentLevel+1)) {
+				for(int i=1;i<MAX_LEVEL;i++) {
+					if(newExperience<minExperienceLevel.get(currentLevel+i)) {
+						level.put(skill,i-1);
+						break;
+					}
+				}
+			}
+		}
+			
 		Skillset() {
-			skills.put(Skill.mining,1);
-			skills.put(Skill.smithing,1);
+			level.put(Skill.mining,1);
+			level.put(Skill.smithing,1);
 		}
 	}
 
@@ -65,6 +90,15 @@ public class PC {
 			
 			return indices;
 		}
+		
+		boolean isFull() {
+			for(int i=0; i<CAPACITY; i++) {
+				if(items[i]==null) {
+					return false;
+				}
+			}
+			return true;
+		}
 	}
 	
 	class Equipment {
@@ -97,6 +131,12 @@ public class PC {
 			weaponSlot = null;
 			
 			return prevWeapon;
+		}
+		Armour viewArmour(ArmourType.ArmourSlot armourSlot) {
+			return armourSlots.get(armourSlot);
+		}
+		Weapon viewWeapon() {
+			return weaponSlot;
 		}
 	}
 	
@@ -148,5 +188,9 @@ public class PC {
 		if(oldWeapon!=null) {
 			inventory.add(oldWeapon);
 		}
+	}
+	
+	PC(GlobalAddress globalAddress, Hitbox hitbox) {
+		this.globalAddress = globalAddress;
 	}
 }

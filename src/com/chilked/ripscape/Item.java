@@ -46,7 +46,7 @@ public class Item {
 			try {
 				typeLoading();
 			} catch(FileNotFoundException e) {
-				throw new IllegalStateException("Invalid weapon type filename.");
+				throw new IllegalStateException("Invalid item type filename.");
 			}
 		}
 		

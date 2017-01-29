@@ -45,7 +45,7 @@ public class Armour extends Item {
 			try {
 				typeLoading();
 			} catch(FileNotFoundException e) {
-				throw new IllegalStateException("Invalid weapon type filename.");
+				throw new IllegalStateException("Invalid armour type filename.");
 			}
 		}
 		

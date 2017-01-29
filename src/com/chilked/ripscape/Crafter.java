@@ -82,16 +82,18 @@ public class Crafter extends WorldObject { //anvils, forges etc.
 			List<Map<String,Object>> rawList = (List<Map<String,Object>>)yaml.load(stream);
 			
 			for(Map<String,Object> fields : rawList) {
-				String       name            = (String)fields.get("name");
-				String       imageFilename   = (String)fields.get("imageFilename");
-				Skill        targetSkill     = Skill.valueOf((String)fields.get("oreType"));
-				boolean      requiresTool    = (boolean)fields.get("requiresTool");
-				ItemType     tool            = ItemType.getItemTypeObject((String)fields.get("toolName"));
+				String   name            = (String)fields.get("name");
+				String   imageFilename   = (String)fields.get("imageFilename");
+				Point    dimensions      = new Point((int)fields.get("width"),(int)fields.get("height"));
+				Skill    targetSkill     = Skill.valueOf((String)fields.get("oreType"));
+				boolean  requiresTool    = (boolean)fields.get("requiresTool");
+				ItemType tool            = ItemType.getItemTypeObject((String)fields.get("toolName"));
+
 				List<Map<String,Object>> transactionList = (List<Map<String,Object>>)fields.get("transaction");
 				
 				CraftingTransactionType[] craftingTransactionType = CraftingTransactionType.typeLoading(transactionList);
 				
-				CrafterType crafterType = new CrafterType(name,imageFilename,targetSkill,craftingTransactionType,requiresTool,tool);
+				CrafterType crafterType = new CrafterType(name,imageFilename,dimensions,targetSkill,craftingTransactionType,requiresTool,tool);
 				
 				allCrafterTypes.put(name,crafterType);
 			}
@@ -103,14 +105,14 @@ public class Crafter extends WorldObject { //anvils, forges etc.
 			try {
 				typeLoading();
 			} catch(FileNotFoundException e) {
-				throw new IllegalStateException("Invalid ore field type filename.");
+				throw new IllegalStateException("Invalid crafter type filename.");
 			}
 		}
 		
-		CrafterType(String name, String imageFilename, PC.Skillset.Skill targetSkill, CraftingTransactionType[] craftingTransactionType,
+		CrafterType(String name, String imageFilename, Point dimensions, PC.Skillset.Skill targetSkill, CraftingTransactionType[] craftingTransactionType,
 		            boolean requiresTool, ItemType tool) {
 			
-			super(name,imageFilename);
+			super(name,imageFilename,dimensions);
 			this.targetSkill             = targetSkill;
 			this.craftingTransactionType = craftingTransactionType;
 			this.requiresTool            = requiresTool;

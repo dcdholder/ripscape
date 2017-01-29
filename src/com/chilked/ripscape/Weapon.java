@@ -10,7 +10,7 @@ import com.chilked.ripscape.Ammunition.AmmunitionType;
 public class Weapon extends Item {
 	private final WeaponType weaponType;
 	
-	private static class WeaponType extends ItemType {
+	public static class WeaponType extends ItemType {
 		final static String WEAPON_YAML = "weapon.yaml";
 		private static final Map<String,WeaponType> allWeaponTypes = new HashMap<String,WeaponType>();
 		
@@ -29,6 +29,9 @@ public class Weapon extends Item {
 		public enum SubType    { dagger, pick; }
 		public enum DamageType { slash, stab, crush; }
 		public enum Handedness { one, two; }
+		
+		public SubType getSubType() { return subType; }
+		public float getReach()     { return reach; }
 		
 		private static void typeLoading() throws FileNotFoundException {
 			Yaml yaml = new Yaml();
@@ -85,6 +88,8 @@ public class Weapon extends Item {
 			this.attackSpeed       = attackSpeed;
 		}
 	}
+	
+	WeaponType getWeaponType() { return weaponType; }
 	
 	Weapon(String name) {
 		super(WeaponType.getWeaponTypeObject(name));
