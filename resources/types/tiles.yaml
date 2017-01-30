@@ -1,0 +1,9 @@
+- name:          Mine Floor
+  passable:      true
+  symbol:        f
+  imageFilename: mine_floor.png
+  
+- name:          Mine Wall
+  passable:      true
+  symbol:        w
+  imageFilename: mine_wall.png

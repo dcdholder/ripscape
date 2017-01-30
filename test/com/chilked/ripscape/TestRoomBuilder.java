@@ -63,8 +63,11 @@ public class TestRoomBuilder {
 		//TODO: get the filenames from the filesystem
 		
 		for(String preProcessFilename : preToPostProcessFilename.keySet()) {
-			String[] preText  = Globe.Room.RoomBuilder.loadRoomText(POSITIVE_TEST_ROOMS + "/" + preProcessFilename);
-			String[] postText = Globe.Room.RoomBuilder.loadRoomText(POSITIVE_TEST_ROOMS + "/" + preToPostProcessFilename.get(preProcessFilename));
+			Globe.Room.RoomBuilder roomBuilderPre  = new Globe.Room.RoomBuilder(POSITIVE_TEST_ROOMS + "/" + preProcessFilename,'w','f');
+			Globe.Room.RoomBuilder roomBuilderPost = new Globe.Room.RoomBuilder(POSITIVE_TEST_ROOMS + "/" + preToPostProcessFilename.get(preProcessFilename),'w','f');
+			
+			String[] preText  = roomBuilderPre.loadRoomText();
+			String[] postText = roomBuilderPost.loadRoomText();
 			
 			assertEquals(preText.length,postText.length);
 			
@@ -79,7 +82,9 @@ public class TestRoomBuilder {
 		List<String> filenames = getFilenames(NEGATIVE_UNCLOSED_TEST_ROOMS);
 		
 		for(String filename : filenames) {
-			Globe.Room.RoomBuilder.loadRoomText(NEGATIVE_UNCLOSED_TEST_ROOMS + "/" + filename);
+			Globe.Room.RoomBuilder roomBuilder = new Globe.Room.RoomBuilder(NEGATIVE_UNCLOSED_TEST_ROOMS + "/" + filename,'w','f');
+			
+			roomBuilder.loadRoomText();
 		}
 	}
 	
@@ -90,8 +95,11 @@ public class TestRoomBuilder {
 		//TODO: get the filenames from the filesystem
 		
 		for(String preProcessFilename : preToPostProcessFilename.keySet()) {
-			String[] preText  = Globe.Room.RoomBuilder.loadRoomText(NEGATIVE_WRONG_POST_TEST_ROOMS + "/" + preProcessFilename);
-			String[] postText = Globe.Room.RoomBuilder.loadRoomText(NEGATIVE_WRONG_POST_TEST_ROOMS + "/" + preToPostProcessFilename.get(preProcessFilename));
+			Globe.Room.RoomBuilder roomBuilderPre  = new Globe.Room.RoomBuilder(NEGATIVE_WRONG_POST_TEST_ROOMS + "/" + preProcessFilename,'w','f');
+			Globe.Room.RoomBuilder roomBuilderPost = new Globe.Room.RoomBuilder(NEGATIVE_WRONG_POST_TEST_ROOMS + "/" + preToPostProcessFilename.get(preProcessFilename),'w','f');
+			
+			String[] preText  = roomBuilderPre.loadRoomText();
+			String[] postText = roomBuilderPost.loadRoomText();
 			
 			assertEquals(preText.length,postText.length);
 			

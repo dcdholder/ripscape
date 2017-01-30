@@ -1,0 +1,6 @@
+- name:          Crate
+  imageFilename: crate.png
+  width:         1
+  height:        1
+  stackable:     true
+  capacity:      100 

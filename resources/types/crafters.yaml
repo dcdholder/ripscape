@@ -1,5 +1,7 @@
 - name:          Anvil
   imageFilename: anvil.png
+  width:         1
+  height:        1
   targetSkill:   smithing
   requiresTool:  true
   toolName:      Hammer
@@ -91,6 +93,8 @@
           
 - name:          Forge
   imageFilename: forge.png
+  width:         1
+  height:        1
   targetSkill:   smithing
   requiresTool:  false
   toolName:      none

@@ -1,0 +1,17 @@
+- name:         demo1
+  roomFilename: demo1.txt
+  defFloor:     Mine Floor
+  defWall:      Mine Wall
+  portals:
+  - sourceId: 1
+    destRoom: demo2
+    destId:   1
+
+- name:         demo2
+  roomFilename: demo2.txt
+  defFloor:     Mine Floor
+  defWall:      Mine Wall
+  portals:
+  - sourceId: 1
+    destRoom: demo1
+    destId:   1

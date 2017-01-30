@@ -142,14 +142,16 @@ public class Globe {
 		}
 	
 		static public class RoomBuilder {
-			private static final char[] wallChars;
-			private static final char[] floorChars;
-			private static final char[] worldObjectChars;
+			private static List<Character> wallChars;
+			private static List<Character> floorChars;
+			private static List<Character> worldObjectChars;
 			
-			private static final char defWallChar;
-			private static final char defFloorChar;
+			private final String roomFilename;
 			
-			static public String[] loadRoomText(String roomFilename) {
+			private final char defWallChar;
+			private final char defFloorChar;
+			
+			public String[] loadRoomText() {
 				try {
 					Scanner scanner = new Scanner(new File(roomFilename));
 					List<String> lines   = new ArrayList<String>();
@@ -168,7 +170,12 @@ public class Globe {
 				}
 			}
 			
-			static String[] deepCopy(String[] inputStrings) {
+			private boolean charIsWall(char c)        { return wallChars.contains(c); }
+			private boolean charIsFloor(char c)       { return floorChars.contains(c); }
+			private boolean charIsWorldObject(char c) { return worldObjectChars.contains(c); }
+			private boolean charIsEmpty(char c)       { return c==' '; }
+			
+			private String[] deepCopy(String[] inputStrings) {
 				String[] stringsCopy = new String[inputStrings.length];
 
 				for(int i=0; i<inputStrings.length; i++) {
@@ -178,7 +185,7 @@ public class Globe {
 				return stringsCopy;
 			}
 
-			static String[] preprocessRoomText(String[] inputLines) {
+			private String[] preprocessRoomText(String[] inputLines) {
 				String[] lines;
 				
 				lines = replaceEmptyWithFloors(inputLines);
@@ -189,7 +196,7 @@ public class Globe {
 				return lines;
 			}
 
-			static void checkPoint(char[][] charSquare, Set<Point> checkedPoints, Point point) {
+			private void checkPoint(char[][] charSquare, Set<Point> checkedPoints, Point point) {
 				checkedPoints.add(point);
 
 				if(!charIsWall(charSquare[point.x][point.y])) {
@@ -215,7 +222,7 @@ public class Globe {
 				}
 			}
 
-			static String[] replaceEmptyWithFloors(String[] inputLines) {
+			private String[] replaceEmptyWithFloors(String[] inputLines) {
 				String[] lines = deepCopy(inputLines);
 				
 				//convert String array into double char array
@@ -247,9 +254,11 @@ public class Globe {
 				if(!foundPoint) {
 					throw new IllegalStateException("Could not find a pair of wall characters for pixel fill.");
 				}
+				
+				return lines;
 			}
 
-			static String[] replaceEmptyWithWalls(String[] inputLines) {
+			private String[] replaceEmptyWithWalls(String[] inputLines) {
 				String[] lines = deepCopy(inputLines);
 
 				//now that we've set all enclosed floor tiles to the appropriate characters, replace all empty
@@ -258,7 +267,7 @@ public class Globe {
 					char[] lineChars = lines[j].toCharArray();
 				
 					for(int i=0; i<lineChars.length; i++) {
-						if(charIsEmpty(lines[j].toCharArray())) {
+						if(charIsEmpty(lines[j].toCharArray()[i])) {
 							lineChars[i] = defWallChar;
 						}
 					}
@@ -269,7 +278,7 @@ public class Globe {
 				return lines;
 			}
 
-			static String[] truncateToWalls(String[] inputLines) {
+			private String[] truncateToWalls(String[] inputLines) {
 				String[] lines = deepCopy(inputLines);
 
 				//truncate lines to the horizontal position of the furthest wall character in the file, recognize lines without walls
@@ -280,7 +289,7 @@ public class Globe {
 				
 					int highestWallIndexLine=-1;
 					for(int i=0; i<lineChars.length; i++) {
-						if(charIsWall()) {
+						if(charIsWall(lineChars[i])) {
 							highestWallIndexLine = i;
 						}
 					}
@@ -300,7 +309,7 @@ public class Globe {
 				//delete lines without walls
 				int deletedLinesCount = 0;
 				for(int j=0;j<lines.length;j++) {
-					if(markForDeletion[i]) {
+					if(markForDeletion[j]) {
 						deletedLinesCount++;
 						for(int i=j;i<lines.length-1;i++) {
 							lines[i] = lines[i+1];
@@ -308,22 +317,30 @@ public class Globe {
 					}
 				}
 
-				lines = Arrays.asList(removeRange(lines.length-deletedLinesCount,lines.length-1)).toArray();
+				List<String> linesArrayList = new ArrayList<String>();
+				linesArrayList.addAll(Arrays.asList(lines)); //removeRange only available to ArrayList
+				linesArrayList.subList(lines.length-deletedLinesCount,lines.length-1).clear();
 				
-				return lines;
+				return linesArrayList.toArray(lines);
 			}
 
-			static void checkInvalidChars(String[] inputLines) {
+			private void checkInvalidChars(String[] inputLines) {
 				String[] lines = deepCopy(inputLines);
 
 				//now check if there are any invalid characters (nonexistent WorldObjects, tileTypes, etc.)
 				for(String line : lines) {
 					for(char lineChar : line.toCharArray()) {
-						if(!charIsWall() && !charIsFloor() && !charIsWorldObject()) {
+						if(!charIsWall(lineChar) && !charIsFloor(lineChar) && !charIsWorldObject(lineChar)) {
 							throw new IllegalStateException("Invalid Unicode room map character.");
 						}
 					}
 				}
+			}
+			
+			RoomBuilder(String roomFilename, char defWallChar, char defFloorChar) {
+				this.roomFilename = roomFilename;
+				this.defWallChar  = defWallChar;
+				this.defFloorChar = defFloorChar;
 			}
 		}
 		
@@ -336,9 +353,11 @@ public class Globe {
 		}
 		
 		Room(String name, String roomFilename) {
+			RoomBuilder roomBuilder = new RoomBuilder(roomFilename,'w','f'); //TODO: load appropriate wall and floor chars
+			
 			this.name          = name;
 			this.roomFilename  = roomFilename;
-			this.asciiMap      = RoomBuilder.loadRoomText(roomFilename);
+			this.asciiMap      = roomBuilder.loadRoomText();
 			this.portals       = loadPortals(asciiMap);
 			this.worldObjects  = loadWorldObjects(asciiMap);
 			//TODO: how are the other fields derived from these
