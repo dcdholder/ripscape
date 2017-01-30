@@ -105,8 +105,8 @@ public class OreField extends WorldObject {
 		return false; //TODO: make this do something
 	}
 	
-	OreField(Point lowerCorner, Point dimensions, OreFieldType oreFieldType) {
-		super(lowerCorner,dimensions);
+	OreField(Point lowerCorner, OreFieldType oreFieldType) {
+		super(oreFieldType,lowerCorner);
 		this.oreFieldType = oreFieldType;
 	}
 }

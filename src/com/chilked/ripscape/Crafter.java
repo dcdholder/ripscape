@@ -120,8 +120,8 @@ public class Crafter extends WorldObject { //anvils, forges etc.
 		}
 	}
 	
-	Crafter(Point lowerCorner, Point dimensions, CrafterType crafterType) {
-		super(lowerCorner,dimensions);
-		this.crafterType = crafterType;
+	Crafter(CrafterType crafterType, Point lowerCorner) {
+		super(crafterType,lowerCorner);
+		this.crafterType = (CrafterType)worldObjectType;
 	}
 }

@@ -6,8 +6,10 @@ import com.chilked.ripscape.Armour.ArmourType;
 import com.chilked.ripscape.Globe.GlobalAddress;
 
 public class PC {
+	private static int PC_CAPACITY = 28;
+	
 	Skillset  skillset  = new Skillset();
-	Inventory inventory = new Inventory();
+	Inventory inventory = new Inventory(PC_CAPACITY);
 	Equipment equipment = new Equipment();
 	GlobalAddress globalAddress;
 	Hitbox hitbox;
@@ -42,62 +44,6 @@ public class PC {
 		Skillset() {
 			level.put(Skill.mining,1);
 			level.put(Skill.smithing,1);
-		}
-	}
-
-	class Inventory {
-		public static final int CAPACITY = 28;
-		Item[] items = new Item[CAPACITY];
-		
-		void add(Item newItem) {
-			for(int i=0; i<CAPACITY; i++) {
-				if(items[i]==null) {
-					items[i] = newItem;
-					return;
-				}
-			}
-			
-			throw new IllegalArgumentException("Cannot add item; no more inventory space.");
-		}
-		
-		Item view(int index) {
-			if(index>=CAPACITY) {
-				throw new NoSuchElementException("Illegal inventory index.");
-			} else {
-				return items[index];  
-			}
-		}
-		
-		Item retrieve(int index) {
-			Item desiredItem = view(index);
-			remove(index);
-			
-			return desiredItem;
-		}
-		
-		void remove(int index) { 
-			items[index] = null; 
-		}
-		
-		List<Integer> retrieveIndices(Item checkItem) {
-			List<Integer> indices = new ArrayList<Integer>();
-			
-			for(int i=0; i<CAPACITY; i++) {
-				if(view(i).getItemType().equals(checkItem.getItemType())) {
-					indices.add(i);
-				}
-			}
-			
-			return indices;
-		}
-		
-		boolean isFull() {
-			for(int i=0; i<CAPACITY; i++) {
-				if(items[i]==null) {
-					return false;
-				}
-			}
-			return true;
 		}
 	}
 	

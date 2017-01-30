@@ -58,7 +58,7 @@ public class Globe {
 		}
 	}
 	
-	private static class Room {
+	public static class Room {
 		final String name;
 	
 		final String   roomFilename;
@@ -141,7 +141,7 @@ public class Globe {
 			}
 		}
 	
-		static private class RoomBuilder {
+		static public class RoomBuilder {
 			private static final char[] wallChars;
 			private static final char[] floorChars;
 			private static final char[] worldObjectChars;
@@ -149,7 +149,7 @@ public class Globe {
 			private static final char defWallChar;
 			private static final char defFloorChar;
 			
-			static private String[] loadRoomText(String roomFilename) {
+			static public String[] loadRoomText(String roomFilename) {
 				try {
 					Scanner scanner = new Scanner(new File(roomFilename));
 					List<String> lines   = new ArrayList<String>();

@@ -4,8 +4,9 @@ import java.awt.*;
 import java.awt.geom.Point2D;
 
 public abstract class WorldObject {
-	Point lowerCorner;
+	WorldObjectType worldObjectType;
 	
+	Point lowerCorner;	
 	Hitbox hitbox;
 	
 	public static class WorldObjectType {
@@ -31,8 +32,8 @@ public abstract class WorldObject {
 		}
 	}
 	
-	WorldObject(Point lowerCorner, Point dimensions) {
+	WorldObject(WorldObjectType worldObjectType, Point lowerCorner) {
 		this.lowerCorner = lowerCorner;
-		this.hitbox      = new Hitbox(lowerCorner,dimensions);
+		this.hitbox      = new Hitbox(lowerCorner,worldObjectType.dimensions);
 	}
 }
