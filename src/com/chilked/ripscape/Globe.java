@@ -61,6 +61,8 @@ public class Globe {
 	public static class Room {
 		final String name;
 	
+		final TileMap tileMap;
+		
 		final String   roomFilename;
 		final String[] asciiMap;
 	
@@ -85,59 +87,273 @@ public class Globe {
 			}
 		}
 		
-		static class Tile {
-			Point lowerCorner;
+		static class TileMap {
+			Tile[][] map;
 			
-			static class TileType {
-				final static String TILE_YAML = "tile.yaml";
-				private static final Map<String,TileType> allTileTypes = new HashMap<String,TileType>();
+			static class Tile {
+				TileType   tileType;
+				List<Item> items; //dropped items
 				
-				final private String  name;
-				final private boolean passable;
-				final private char    symbol;
-				final private String  imageFilename;
-				final private Image   image;
-				
-				private static void typeLoading() throws FileNotFoundException {
-					Yaml yaml = new Yaml();
-					FileInputStream stream = new FileInputStream(new File(TILE_YAML));
+				static class TileType {
+					final static String TILE_YAML = "tile.yaml";
+					private static final Map<String,TileType> allTileTypes = new HashMap<String,TileType>();
 					
-					@SuppressWarnings("unchecked")
-					List<Map<String,Object>> rawList = (List<Map<String,Object>>)yaml.load(stream);
+					final private String  name;
+					final private boolean passable;
+					final private char    symbol;
+					final private String  imageFilename;
+					final private Image   image;
 					
-					for(Map<String,Object> fields : rawList) {
-						String  name          = (String)fields.get("name");
-						boolean passable      = (boolean)fields.get("passable");
-						char    symbol        = (char)fields.get("symbol");
-						String  imageFilename = (String)fields.get("imageFilename");
+					boolean isPassable() { return passable; }
+					
+					private static void typeLoading() throws FileNotFoundException {
+						Yaml yaml = new Yaml();
+						FileInputStream stream = new FileInputStream(new File(TILE_YAML));
 						
-						TileType tileType = new TileType(name,passable,symbol,imageFilename);
+						@SuppressWarnings("unchecked")
+						List<Map<String,Object>> rawList = (List<Map<String,Object>>)yaml.load(stream);
 						
-						allTileTypes.put(name,tileType);
+						for(Map<String,Object> fields : rawList) {
+							String  name          = (String)fields.get("name");
+							boolean passable      = (boolean)fields.get("passable");
+							char    symbol        = (char)fields.get("symbol");
+							String  imageFilename = (String)fields.get("imageFilename");
+							
+							TileType tileType = new TileType(name,passable,symbol,imageFilename);
+							
+							allTileTypes.put(name,tileType);
+						}
+					}
+					
+					static TileType getTileTypeObject(String tileTypeName) { return allTileTypes.get(tileTypeName); }
+					
+					public String toString() { return name; }
+					
+					private Image loadImage(String imageFilename) { return null; } //TODO: this should actually do something
+					
+					static {
+						try {
+							typeLoading();
+						} catch(FileNotFoundException e) {
+							throw new IllegalStateException("Invalid tile type filename.");
+						}
+					}
+					
+					TileType(String name, boolean passable, char symbol, String imageFilename) {
+						this.name          = name;
+						this.passable      = passable;
+						this.symbol        = symbol;
+						this.imageFilename = imageFilename;
+						this.image         = loadImage(imageFilename);
 					}
 				}
 				
-				static TileType getTileTypeObject(String tileTypeName) { return allTileTypes.get(tileTypeName); }
-				
-				public String toString() { return name; }
-				
-				private Image loadImage(String imageFilename) { return null; } //TODO: this should actually do something
-				
-				static {
-					try {
-						typeLoading();
-					} catch(FileNotFoundException e) {
-						throw new IllegalStateException("Invalid tile type filename.");
+				static class Node {
+					Node  parentNode;
+					Point thisPoint;
+					Point destPoint;
+
+					double costFromSource;
+					double furtherDistanceEstimate;
+					
+					double totalCost() {
+						return costFromSource + furtherDistanceEstimate;
+					}
+
+					double beelineDistance(Point pointA, Point pointB) {
+						if(pointA.equals(pointB)) {
+							return 0.0;
+						}
+					
+						if(pointA.x==pointB.x) {
+							return abs(pointB.x-pointA.x);
+						} else if(pointA.y==pointB.y) {
+							return abs(pointB.y-pointA.y);
+						} else {
+							double diagonalDistance;
+							double horizontalDistance;
+					
+							if(abs(pointB.x-pointA.x)<abs(pointB.y-pointA.y)) {
+								diagonalDistance   = abs(pointB.x-pointA.x)*Math.sqrt(2.0);
+								horizontalDistance = abs(pointB.y-pointA.y) - abs(pointB.x-pointA.x);
+							} else {
+								diagonalDistance   = abs(pointB.y-pointA.y)*Math.sqrt(2.0);
+								horizontalDistance = abs(pointB.x-pointA.x) - abs(pointB.y-pointA.y);
+							}
+						
+							return diagonalDistance + horizontalDistance;
+						}
+					}
+
+					//note that diagonal movement is only an option when three squares are clear
+					List<Point> getPathToSquare(Point initialPoint, Point finalPoint) {
+						Node initialNode = new Node(null,initialPoint,finalPoint,0.0);
+					
+						return initialNode.getPathToSquareInternal(new List<Node>(),new List<Node>());
+					}
+
+					//run this from a node object
+					List<Point> getPathToSquareInternal(List<Node> closedNodes, List<Node> openNodes) {
+						List<Point> visitableAdjacentSquares = visitableAdjacentSquares(thisPoint);
+
+						//add to the list of closed points, remove from list of open points
+						closedNodes.add(this);
+					
+						if(openNodes.size()!=0) {
+							openNodes.remove(this);
+						}
+					
+						//if there are any visitable adjacent squares not in the open list, add them
+						for(Point adjacentPoint : visitableAdjacentSquares) {
+							matchFound = false;
+							for(Node openNode : openNodes) {
+								if(openNode.matchesPoint(adjacentPoint)) {
+									matchFound = true;
+									break;
+								}
+							}
+							if(!matchFound) {
+								openNodes.add(new Node(this,adjacentPoint,finalPoint,costFromSource+beelineDistance(thisPoint,adjacentPoint)));
+							}
+						}
+					
+						//if we were not able to add open nodes in this call, and the openNodes list is empty...
+						throw new IllegalStateException("Could not find an open path to the destination");
+					
+						//now search the open points list for the most promising lead, and take it
+						Node    cheapestNode;
+						double  smallestCost;
+						boolean firstIteration = true;
+						for(Node openNode : openNodes) {
+							if(openNode.totalCost()<smallestCost || firstIteration) {
+								cheapestNode = openNode;
+								smallestCost = openNode.totalCost();
+							}
+							firstIteration = false;
+						}
+					
+						if(thisPoint.equals(destPoint) && cheapestNode.totalCost()>=this.totalCost()) {
+							List<Point> path = new ArrayList<Point>();
+							//reverse through parent nodes until you reach the node with a null parent
+							Node checkNode = this;
+							while(checkNode.parentNode!=null) {
+								path.add(checkNode.thisPoint);
+								checkNode = checkNode.parentNode;
+							}
+							path.add(checkNode.thisPoint);
+						
+							return path;
+						} else {
+							//one recursion for every checked node - possiblity for stack overflow?
+							return cheapestNode.getPathToSquareInternal(closedNodes,openNodes);
+						}
+					}
+					
+					void moveInDirection(Direction direction) {
+						moving = true;
+					}
+
+					void moveToSquare(Point finalSquare) {
+						List<Point>     path       = getPathToSquare(this.location,finalPoint);
+						List<Direction> directions = Direction.getDirectionsFromPath(path);
+					
+						for(int i=0; i<directions.size(); i++) {
+							moveInDirection(directions.get(i));
+						}
+					}
+
+					boolean singleSquareMovementPossible(Point pointA, Point pointB) {
+						List<Point> passThroughPoints = getPassThroughPoints(pointA, pointB);
+					
+						boolean passable = true;
+						for(Point passThroughPoint : passThroughPoints) {
+							if(!tileMap.passable(passThroughPoint)) {
+								passable = false;
+							}
+						}
+					
+						return passable;
+					}
+
+					List<Point> getVisitableAdjacentSquares(Point pointA) {
+						List<Point> adjacentSquares  = getAdjacentSquares(pointA);
+						List<Point> visitableSquares = new ArrayList<Point>();
+					
+						for(Point adjacentSquare : adjacentSquares) {
+							if(singleSquareMovementPossible(pointA,adjacentSquare)) {
+								visitableSquares.add(adjacentSquare);
+							}
+						}
+					
+						return visitableSquares();
+					}
+
+					List<Point> getAdjacentSquares(Point pointA) {
+						List<Point> adjacentSquares = new ArrayList<Point>();
+					
+						adjacentSquares.add(new Point(pointA.x+1,pointA.y));
+						adjacentSquares.add(new Point(pointA.x-1,pointA.y));
+						adjacentSquares.add(new Point(pointA.x,pointA.y+1));
+						adjacentSquares.add(new Point(pointA.x,pointA.y-1));
+					
+						return adjacentSquares;
+					}
+
+					List<Point> getPassThroughPoints(Point pointA, Point pointB) {
+						List<Point> passThroughPoints = new ArrayList<Point>();
+					
+						direction = Direction.getDirectionFromAdjacentPoints(pointA,pointB);
+					
+						if(direction.isGridwise()) {
+							return pointB;
+						} else if(direction.isDiagonal()) {
+							return direction.divideUpDiagonal();
+						}
+					}
+
+					List<Direction> getPathToPerimeter(Point initialPoint) {
+						boolean         foundSmallerPath = false;
+						List<Direction> smallestPath;
+						double          smallestPathLength = 10000.0; //this is the cutoff - paths must be shorter than this to be found
+
+						for(Point point : getPerimeter()) {
+							List<Direction> path = getPathToSquare;
+							double          pathLength = pathLength(path);
+						
+							if(pathLength<smallestPathLength) {
+								foundSmallerPath   = true;
+								smallestPath       = path;
+								smallestPathLength = pathLength;
+							}
+						}
+					
+						if(!foundSmallerPath) {
+							IllegalStateException("No path found.");
+						}
+					}
+
+					Node(Node parentNode, Point thisPoint, Point destPoint, double costFromSource) {
+						this.thisPoint               = thisPoint;
+						this.destPoint               = destPoint;
+						this.costFromSource          = costFromSource;
+						this.furtherDistanceEstimate = beelineDistance(thisPoint,destPoint);
 					}
 				}
 				
-				TileType(String name, boolean passable, char symbol, String imageFilename) {
-					this.name          = name;
-					this.passable      = passable;
-					this.symbol        = symbol;
-					this.imageFilename = imageFilename;
-					this.image         = loadImage(imageFilename);
+				TileType getTileType() { return tileType; }
+				
+				Tile(TileType tileType, List<Item> items) {
+					this.tileType = tileType;
+					this.items    = items;
 				}
+			}
+			
+			boolean passable(Point point) {
+				return map[point.y][point.y].getTileType().isPassable();
+			}
+			
+			TileMap(Tile[][] map) {
+				this.map = map;
 			}
 		}
 	
@@ -355,6 +571,7 @@ public class Globe {
 		Room(String name, String roomFilename) {
 			RoomBuilder roomBuilder = new RoomBuilder(roomFilename,'w','f'); //TODO: load appropriate wall and floor chars
 			
+			//TODO: separate Room and RoomBuilder code better
 			this.name          = name;
 			this.roomFilename  = roomFilename;
 			this.asciiMap      = roomBuilder.loadRoomText();

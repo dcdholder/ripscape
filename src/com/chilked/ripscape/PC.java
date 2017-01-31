@@ -3,10 +3,14 @@ package com.chilked.ripscape;
 import java.util.*;
 
 import com.chilked.ripscape.Armour.ArmourType;
+import com.chilked.ripscape.Globe.Direction;
 import com.chilked.ripscape.Globe.GlobalAddress;
 
 public class PC {
-	private static int PC_CAPACITY = 28;
+	private static int PC_CAPACITY = 28;	
+	
+	float moveSpeed;
+	boolean moving;
 	
 	Skillset  skillset  = new Skillset();
 	Inventory inventory = new Inventory(PC_CAPACITY);
@@ -133,6 +137,22 @@ public class PC {
 		
 		if(oldWeapon!=null) {
 			inventory.add(oldWeapon);
+		}
+	}
+	public void discreteMove(Direction direction) { //keyboard arrow keys
+		Point destinationLowerCorner;
+		
+		if(!moving) {
+			switch(direction) {
+				case up:
+					destinationLowerCorner = new Point(hitbox.lowerLeft.getX(),);
+				case down:
+					destinationLowerCorner = new Point();
+				case left:
+					destinationLowerCorner = new Point();
+				case right:
+					destinationLowerCorner = new Point();
+			}
 		}
 	}
 }
