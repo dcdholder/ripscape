@@ -23,7 +23,7 @@
 - name:        Iron Full Helm
   baseValue:   20
   armourSlot:  head
-  baseDefense: 3
+  baseDefense: 3.0
   
 - name:        Steel Full Helm
   baseValue:   200

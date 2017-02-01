@@ -10,6 +10,8 @@ public abstract class WorldObject {
 	Hitbox hitbox;
 	
 	public static class WorldObjectType {
+		static final String WORLD_OBJECT_YAML_DIRECTORY = "resources/types/";
+		
 		final private String name;
 
 		Point dimensions;

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.yaml.snakeyaml.Yaml;
 
+import com.chilked.ripscape.Container.ContainerType;
 import com.chilked.ripscape.Item.ItemType;
 import com.chilked.ripscape.PC.Skillset.Skill;
 
@@ -17,7 +18,7 @@ public class Crafter extends WorldObject { //anvils, forges etc.
 	private final CrafterType crafterType;
 	
 	private static class CrafterType extends WorldObject.WorldObjectType {
-		final static String CRAFTER_YAML = "crafter.yaml";
+		final static String CRAFTER_YAML = "crafters.yaml";
 		private static final Map<String,CrafterType> allCrafterTypes = new HashMap<String,CrafterType>();
 		
 		private final PC.Skillset.Skill targetSkill; 
@@ -76,7 +77,7 @@ public class Crafter extends WorldObject { //anvils, forges etc.
 		
 		private static void typeLoading() throws FileNotFoundException {
 			Yaml yaml = new Yaml();
-			FileInputStream stream = new FileInputStream(new File(CRAFTER_YAML));
+			FileInputStream stream = new FileInputStream(new File(WORLD_OBJECT_YAML_DIRECTORY+CRAFTER_YAML));
 			
 			@SuppressWarnings("unchecked")
 			List<Map<String,Object>> rawList = (List<Map<String,Object>>)yaml.load(stream);
@@ -85,7 +86,7 @@ public class Crafter extends WorldObject { //anvils, forges etc.
 				String   name            = (String)fields.get("name");
 				String   imageFilename   = (String)fields.get("imageFilename");
 				Point    dimensions      = new Point((int)fields.get("width"),(int)fields.get("height"));
-				Skill    targetSkill     = Skill.valueOf((String)fields.get("oreType"));
+				Skill    targetSkill     = Skill.valueOf((String)fields.get("targetSkill"));
 				boolean  requiresTool    = (boolean)fields.get("requiresTool");
 				ItemType tool            = ItemType.getItemTypeObject((String)fields.get("toolName"));
 
@@ -99,7 +100,7 @@ public class Crafter extends WorldObject { //anvils, forges etc.
 			}
 		}
 		
-		static CrafterType getItemTypeObject(String crafterTypeName) { return allCrafterTypes.get(crafterTypeName); }
+		static CrafterType getCrafterTypeObject(String crafterTypeName) { return allCrafterTypes.get(crafterTypeName); }
 		
 		static {
 			try {
@@ -118,6 +119,10 @@ public class Crafter extends WorldObject { //anvils, forges etc.
 			this.requiresTool            = requiresTool;
 			this.tool                    = tool;
 		}
+	}
+	
+	Crafter(String containerName, Point lowerCorner) {
+		this(CrafterType.getCrafterTypeObject(containerName),lowerCorner);
 	}
 	
 	Crafter(CrafterType crafterType, Point lowerCorner) {

@@ -7,23 +7,23 @@ import java.util.*;
 
 import org.yaml.snakeyaml.Yaml;
 
-public class Ammunition extends Item {
-	final static String AMMO_YAML = "ammo.yaml"; //TODO: set this to something
-	private static final Map<String,AmmunitionType> allAmmunitionTypes = new HashMap<String,AmmunitionType>();
-	
+public class Ammunition extends Item {	
 	private final AmmunitionType ammunitionType;
 	
-	public static class AmmunitionType extends Item.ItemType { 
+	public static class AmmunitionType extends Item.ItemType {
+		final static String AMMUNITION_YAML = "ammunition.yaml"; //TODO: set this to something
+		private static final Map<String,AmmunitionType> allAmmunitionTypes = new HashMap<String,AmmunitionType>();
+		
 		private final SubType subType;
 		
-		private final float baseDamage;
+		private final double baseDamage;
 		
 		public enum SubType { arrow, bolt, knife; }
 		SubType getSubType() { return subType; }
 		
 		private static void typeLoading() throws FileNotFoundException {
 			Yaml yaml = new Yaml();
-			FileInputStream stream = new FileInputStream(new File(AMMO_YAML));
+			FileInputStream stream = new FileInputStream(new File(ITEM_YAML_DIRECTORY+AMMUNITION_YAML));
 			
 			@SuppressWarnings("unchecked")
 			List<Map<String,Object>> rawList = (List<Map<String,Object>>)yaml.load(stream);
@@ -32,7 +32,7 @@ public class Ammunition extends Item {
 				String  name       = (String)fields.get("name");
 				int     baseValue  = (int)fields.get("baseValue");
 				SubType subType    = SubType.valueOf((String)fields.get("subType"));
-				float   baseDamage = (float)fields.get("baseDamage");
+				double  baseDamage = (double)fields.get("baseDamage");
 				
 				AmmunitionType ammunitionType = new AmmunitionType(name,baseValue,subType,baseDamage);
 				
@@ -50,7 +50,7 @@ public class Ammunition extends Item {
 			}
 		}
 		
-		AmmunitionType(String name, int baseValue, SubType subType, float baseDamage) {
+		AmmunitionType(String name, int baseValue, SubType subType, double baseDamage) {
 			super(name,baseValue,true);
 			this.subType    = subType;
 			this.baseDamage = baseDamage;

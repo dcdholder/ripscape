@@ -10,13 +10,15 @@ import java.util.Map;
 
 import org.yaml.snakeyaml.Yaml;
 
+import com.chilked.ripscape.Armour.ArmourType;
+
 public class Container extends WorldObject {
 	ContainerType containerType;
 	
 	Inventory inventory;
 	
 	public static class ContainerType extends WorldObjectType {
-		final static String CONTAINER_YAML = "container.yaml";
+		final static String CONTAINER_YAML = "containers.yaml";
 		private static final Map<String,ContainerType> allContainerTypes = new HashMap<String,ContainerType>();
 		
 		boolean stackable;
@@ -24,7 +26,7 @@ public class Container extends WorldObject {
 		
 		private static void typeLoading() throws FileNotFoundException {
 			Yaml yaml = new Yaml();
-			FileInputStream stream = new FileInputStream(new File(CONTAINER_YAML));
+			FileInputStream stream = new FileInputStream(new File(WORLD_OBJECT_YAML_DIRECTORY+CONTAINER_YAML));
 			
 			@SuppressWarnings("unchecked")
 			List<Map<String,Object>> rawList = (List<Map<String,Object>>)yaml.load(stream);
@@ -42,7 +44,7 @@ public class Container extends WorldObject {
 			}
 		}
 		
-		static ContainerType getItemTypeObject(String containerTypeName) { return allContainerTypes.get(containerTypeName); }
+		static ContainerType getContainerTypeObject(String containerTypeName) { return allContainerTypes.get(containerTypeName); }
 		
 		static {
 			try {
@@ -57,6 +59,10 @@ public class Container extends WorldObject {
 			this.stackable = stackable;
 			this.capacity  = capacity;
 		}
+	}
+	
+	Container(String containerName, Point lowerCorner) {
+		this(ContainerType.getContainerTypeObject(containerName),lowerCorner);
 	}
 	
 	Container(ContainerType containerType, Point lowerCorner) {

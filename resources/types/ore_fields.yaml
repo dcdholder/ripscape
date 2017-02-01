@@ -1,7 +1,7 @@
 - name:               Tin Ore Field
   imageFilename:      tin_ore_field.png
   oreType:            Tin Ore
-  baseMinetime:       1.0
+  baseMineTime:       1.0
   respawnTime:        1.0
   minimumMiningLevel: 1
   experience:         10
@@ -9,7 +9,7 @@
 - name:               Copper Ore Field
   imageFilename:      copper_ore_field.png
   oreType:            Copper Ore
-  baseMinetime:       1.0
+  baseMineTime:       1.0
   respawnTime:        1.0
   minimumMiningLevel: 1
   experience:         10
@@ -17,7 +17,7 @@
 - name:               Iron Ore Field
   imageFilename:      iron_ore_field.png
   oreType:            Iron Ore
-  baseMinetime:       2.0
+  baseMineTime:       2.0
   respawnTime:        2.0
   minimumMiningLevel: 10
   experience:         15
@@ -25,7 +25,7 @@
 - name:               Coal Ore Field
   imageFilename:      coal_ore_field.png
   oreType:            Coal Ore
-  baseMinetime:       3.0
+  baseMineTime:       3.0
   respawnTime:        3.0
   minimumMiningLevel: 20
   experience:         15

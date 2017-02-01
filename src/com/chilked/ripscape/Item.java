@@ -10,19 +10,20 @@ import org.yaml.snakeyaml.Yaml;
 public class Item {
 	protected final ItemType itemType;
 	
-	final static String MISC_ITEM_YAML = "items.yaml";
-	private static final Map<String,ItemType> allMiscItemTypes = new HashMap<String,ItemType>();
-	
 	int num;
 	
 	public static class ItemType {
+		final static String ITEM_YAML_DIRECTORY = "resources/types/";
+		final static String MISC_ITEM_YAML = "items.yaml";
+		private static final Map<String,ItemType> allMiscItemTypes = new HashMap<String,ItemType>();
+		
 		final private String  name;
 		final private int     baseValue;
 		final private boolean stackable;
 		
 		private static void typeLoading() throws FileNotFoundException {
 			Yaml yaml = new Yaml();
-			FileInputStream stream = new FileInputStream(new File(MISC_ITEM_YAML));
+			FileInputStream stream = new FileInputStream(new File(ITEM_YAML_DIRECTORY+MISC_ITEM_YAML));
 			
 			@SuppressWarnings("unchecked")
 			List<Map<String,Object>> rawList = (List<Map<String,Object>>)yaml.load(stream);
@@ -40,6 +41,14 @@ public class Item {
 		
 		static ItemType getItemTypeObject(String itemTypeName) { return allMiscItemTypes.get(itemTypeName); }
 		
+		/*
+		public static void displayAll() { 
+			for(String miscItemType : allMiscItemTypes.keySet()) {
+				System.out.println(getItemTypeObject(miscItemType).toString());
+			}
+		}
+		public String toString() { return "Name: " + name + ", Base Value: " + baseValue; }
+		*/
 		public String toString() { return name; }
 		
 		static {

@@ -11,7 +11,7 @@ public class Weapon extends Item {
 	private final WeaponType weaponType;
 	
 	public static class WeaponType extends ItemType {
-		final static String WEAPON_YAML = "weapon.yaml";
+		final static String WEAPON_YAML = "weapons.yaml";
 		private static final Map<String,WeaponType> allWeaponTypes = new HashMap<String,WeaponType>();
 		
 		private final SubType    subType;
@@ -21,21 +21,21 @@ public class Weapon extends Item {
 		private final boolean                expendsAmmunition;
 		private final AmmunitionType.SubType ammunitionType;
 
-		private final float reach;
+		private final double reach;
 
-		private final float baseDamage;
-		private final float attackSpeed;
+		private final double baseDamage;
+		private final double attackSpeed;
 		
 		public enum SubType    { dagger, pick; }
 		public enum DamageType { slash, stab, crush; }
 		public enum Handedness { one, two; }
 		
-		public SubType getSubType() { return subType; }
-		public float getReach()     { return reach; }
+		public SubType getSubType()  { return subType; }
+		public double getReach()     { return reach; }
 		
 		private static void typeLoading() throws FileNotFoundException {
 			Yaml yaml = new Yaml();
-			FileInputStream stream = new FileInputStream(new File(WEAPON_YAML));
+			FileInputStream stream = new FileInputStream(new File(ITEM_YAML_DIRECTORY+WEAPON_YAML));
 			
 			@SuppressWarnings("unchecked")
 			List<Map<String,Object>> rawList = (List<Map<String,Object>>)yaml.load(stream);
@@ -48,9 +48,9 @@ public class Weapon extends Item {
 				Handedness             handedness        = Handedness.valueOf((String)fields.get("handedness"));
 				boolean                expendsAmmunition = (boolean)fields.get("expendsAmmunition");
 				AmmunitionType.SubType ammunitionType    = null;
-				float                  reach             = (float)fields.get("reach");
-				float                  baseDamage        = (float)fields.get("baseDamage");
-				float                  attackSpeed       = (float)fields.get("attackSpeed");
+				double                 reach             = (double)fields.get("reach");
+				double                 baseDamage        = (double)fields.get("baseDamage");
+				double                 attackSpeed       = (double)fields.get("attackSpeed");
 				
 				if(expendsAmmunition) { //will throw an exception if that ammo type does not exist
 					ammunitionType = AmmunitionType.getAmmunitionTypeObject(((String)fields.get("ammunitionType"))).getSubType();
@@ -75,7 +75,7 @@ public class Weapon extends Item {
 		
 		WeaponType(String name, int baseValue, SubType subType, DamageType damageType, 
 		           Handedness handedness, boolean expendsAmmunition, AmmunitionType.SubType ammunitionType, 
-		           float reach, float baseDamage, float attackSpeed) {
+		           double reach, double baseDamage, double attackSpeed) {
 
 			super(name,baseValue,false); //we choose to make all weapons non-stackable
 			this.subType           = subType;

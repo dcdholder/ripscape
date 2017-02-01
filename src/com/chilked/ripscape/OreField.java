@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.yaml.snakeyaml.Yaml;
 
+import com.chilked.ripscape.Container.ContainerType;
 import com.chilked.ripscape.Item.ItemType;
 import com.chilked.ripscape.PC.Skillset;
 
@@ -18,19 +19,19 @@ public class OreField extends WorldObject {
 	long lastMineTime = 0;
 	
 	public static class OreFieldType extends WorldObjectType {
-		final static String ORE_FIELD_YAML = "ore_field.yaml";
+		final static String ORE_FIELD_YAML = "ore_fields.yaml";
 		private static final Map<String,OreFieldType> allOreFieldTypes = new HashMap<String,OreFieldType>();
 		
 		Item.ItemType oreType;
 		
-		private final float baseMineTime;
-		private final float respawnTime;
+		private final double baseMineTime;
+		private final double respawnTime;
 		private final int   minimumMiningLevel;
 		private final int   experience;
 		
 		private static void typeLoading() throws FileNotFoundException {
 			Yaml yaml = new Yaml();
-			FileInputStream stream = new FileInputStream(new File(ORE_FIELD_YAML));
+			FileInputStream stream = new FileInputStream(new File(WORLD_OBJECT_YAML_DIRECTORY+ORE_FIELD_YAML));
 			
 			@SuppressWarnings("unchecked")
 			List<Map<String,Object>> rawList = (List<Map<String,Object>>)yaml.load(stream);
@@ -38,20 +39,19 @@ public class OreField extends WorldObject {
 			for(Map<String,Object> fields : rawList) {
 				String   name               = (String)fields.get("name");
 				String   imageFilename      = (String)fields.get("imageFilename");
-				Point    dimensions         = new Point((int)fields.get("width"),(int)fields.get("height"));
 				ItemType oreType            = ItemType.getItemTypeObject((String)fields.get("oreType"));
-				float    baseMineTime       = (float)fields.get("baseMineTime");
-				float    respawnTime        = (float)fields.get("respawnTime");
+				double    baseMineTime      = (double)fields.get("baseMineTime");
+				double    respawnTime       = (double)fields.get("respawnTime");
 				int      minimumMiningLevel = (int)fields.get("minimumMiningLevel");
 				int      experience         = (int)fields.get("experience");
 				
-				OreFieldType oreFieldType = new OreFieldType(name,imageFilename,dimensions,oreType,baseMineTime,respawnTime,minimumMiningLevel,experience);
+				OreFieldType oreFieldType = new OreFieldType(name,imageFilename,oreType,baseMineTime,respawnTime,minimumMiningLevel,experience);
 				
 				allOreFieldTypes.put(name,oreFieldType);
 			}
 		}
 		
-		static OreFieldType getItemTypeObject(String oreFieldTypeName) { return allOreFieldTypes.get(oreFieldTypeName); }
+		static OreFieldType getOreFieldTypeObject(String oreFieldTypeName) { return allOreFieldTypes.get(oreFieldTypeName); }
 		
 		static {
 			try {
@@ -61,10 +61,10 @@ public class OreField extends WorldObject {
 			}
 		}
 		
-		OreFieldType(String name, String imageFilename, Point dimensions, ItemType oreType, float baseMineTime, float respawnTime, 
+		OreFieldType(String name, String imageFilename, ItemType oreType, double baseMineTime, double respawnTime, 
 		             int minimumMiningLevel, int experience) {
 
-			super(name, imageFilename, dimensions);
+			super(name, imageFilename, new Point(1,1)); //TODO: ore fields always have 1x1 dimensions - make this static
 			this.oreType            = oreType;
 			this.baseMineTime       = baseMineTime;
 			this.respawnTime        = respawnTime;
@@ -105,7 +105,11 @@ public class OreField extends WorldObject {
 		return false; //TODO: make this do something
 	}
 	
-	OreField(Point lowerCorner, OreFieldType oreFieldType) {
+	OreField(String oreFieldName, Point lowerCorner) {
+		this(OreFieldType.getOreFieldTypeObject(oreFieldName),lowerCorner);
+	}
+	
+	OreField(OreFieldType oreFieldType, Point lowerCorner) {
 		super(oreFieldType,lowerCorner);
 		this.oreFieldType = oreFieldType;
 	}
