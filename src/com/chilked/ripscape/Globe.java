@@ -172,24 +172,6 @@ public class Globe {
 	
 		final Portal[]      portals;      //connections to other rooms
 		final WorldObject[] worldObjects; //anvils, ore fields etc.
-	
-		static class Portal {
-			Direction exitDirection;
-		
-			Point sourcePoint;
-			Point destPoint;
-	
-			String destRoomName;
-			
-			Portal(Direction exitDirection, Point sourcePoint, String destRoomName, 
-			       Point destPoint) {
-			
-				this.exitDirection = exitDirection;
-				this.sourcePoint   = sourcePoint;
-				this.destRoomName  = destRoomName;
-				this.destPoint     = destPoint;
-			}
-		}
 		
 		static class TileMap {
 			Tile[][] map;
@@ -718,6 +700,23 @@ public class Globe {
 			this.portals       = loadPortals(asciiMap);
 			this.worldObjects  = loadWorldObjects(asciiMap);
 			//TODO: how are the other fields derived from these
+		}
+	}
+	
+	private static void typeLoading() throws FileNotFoundException {
+		Yaml yaml = new Yaml();
+		FileInputStream stream = new FileInputStream(new File(WORLD_OBJECT_YAML_DIRECTORY+ORE_FIELD_YAML));
+		
+		@SuppressWarnings("unchecked")
+		List<Map<String,Object>> rawList = (List<Map<String,Object>>)yaml.load(stream);
+		
+		for(Map<String,Object> fields : rawList) {
+			String inputRoomName     = (String)fields.get("name");
+			String inputRoomFilename = (String)fields.get("roomFilename");
+			String defFloor          = (String)fields.get("defFloor");
+			String defWall           = (String)fields.get("defWall");
+			
+			//construct room, add room to rooms list
 		}
 	}
 	

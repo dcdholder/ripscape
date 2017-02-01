@@ -10,8 +10,6 @@ import java.util.Map;
 
 import org.yaml.snakeyaml.Yaml;
 
-import com.chilked.ripscape.Armour.ArmourType;
-
 public class Container extends WorldObject {
 	ContainerType containerType;
 	

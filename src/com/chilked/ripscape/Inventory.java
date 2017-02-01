@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-class Inventory {
+public class Inventory {
 	private final int capacity;
 	Item[] items;
 	
