@@ -30,7 +30,7 @@ public class TestEquipment {
 	private PC initializeWithFullInventory() { //fill inventory with daggers
 		PC pc = new PC();
 		
-		for(int i=0; i<pc.inventory.CAPACITY; i++) {
+		for(int i=0; i<pc.inventory.getCapacity(); i++) {
 			pc.inventory.add(weaponA);
 		}
 		

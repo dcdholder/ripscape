@@ -1,18 +1,21 @@
 package com.chilked.ripscape;
 
 import java.awt.Point;
-import java.awt.geom.Point2D;
+
+import java.util.*;
 
 public class Hitbox {
-	Point2D.Double upperLeft;
-	Point2D.Double lowerLeft;
-	Point2D.Double upperRight;
-	Point2D.Double lowerRight;
+	Point dimensions;
 	
-	Point2D.Double getUpperLeft()  { return upperLeft; }
-	Point2D.Double getLowerLeft()  { return lowerLeft; }
-	Point2D.Double getUpperRight() { return upperRight; }
-	Point2D.Double getLowerRight() { return lowerRight; }
+	Point upperLeft;
+	Point lowerLeft; //lowerLeft is the reference coordinate for any single-cell object
+	Point upperRight;
+	Point lowerRight;
+	
+	Point getUpperLeft()  { return upperLeft; }
+	Point getLowerLeft()  { return lowerLeft; }
+	Point getUpperRight() { return upperRight; }
+	Point getLowerRight() { return lowerRight; }
 	
 	public boolean partiallyEnclosed(Hitbox hitbox) {
 		if(enclosed(hitbox.upperLeft) || enclosed(hitbox.upperRight) || enclosed(hitbox.lowerLeft) || enclosed(hitbox.lowerRight)) {
@@ -30,7 +33,7 @@ public class Hitbox {
 		}
 	}
 	
-	public boolean enclosed(Point2D.Double point) {
+	public boolean enclosed(Point point) {
 		if(lowerLeft.getX()<point.getX()&&lowerRight.getX()>point.getX()) {
 			if(lowerLeft.getY()<point.getY()&&upperLeft.getY()<point.getY()) {
 				return true;
@@ -48,7 +51,7 @@ public class Hitbox {
 		}
 	}
 	
-	public boolean withinDistance(Double distance, Point2D.Double point) {
+	public boolean withinDistance(Double distance, Point point) {
 		if(distance(point)<distance) {
 			return true;
 		} else {
@@ -56,7 +59,7 @@ public class Hitbox {
 		}
 	}
 	
-	private double internalDistance(Point2D.Double point) {
+	private double internalDistance(Point point) {
 		double distLeft   = point.getX()-lowerLeft.getX();
 		double distRight  = lowerRight.getX()-point.getX();
 		double distBottom = point.getY()-lowerRight.getY();
@@ -78,7 +81,7 @@ public class Hitbox {
 		}
 	}
 	
-	public double distance(Point2D.Double point) {
+	public double distance(Point point) {
 		if(point.x<=lowerLeft.x) {
 			if(point.y<=lowerLeft.y) {
 				return lowerLeft.distance(point);
@@ -106,14 +109,36 @@ public class Hitbox {
 		}
 	}
 	
-	Hitbox(Point lowerCorner, Point dimensions) { //lowercorner can either be float-valued or integral
-		this(new Point2D.Double((double)lowerCorner.getX(),(double)lowerCorner.getY()), dimensions);
+	public Set<Point> getPerimeter() {
+		Set<Point> perimeterPoints = new HashSet<Point>();
+		
+		for(int i=lowerLeft.x-1;i<=lowerLeft.x+dimensions.x;i++) {
+			perimeterPoints.add(new Point(i,lowerLeft.y-1));
+			perimeterPoints.add(new Point(i,lowerLeft.y+dimensions.y));
+		}
+		
+		for(int j=lowerLeft.y;j<=lowerLeft.y+dimensions.x-1;j++) {
+			perimeterPoints.add(new Point(lowerLeft.x-1,j));
+			perimeterPoints.add(new Point(lowerLeft.x+dimensions.x,j));
+		}
+		
+		//only points with positive coordinates have meaning here
+		Set<Point> perimeterPointsCopy = new HashSet<Point>();
+		perimeterPointsCopy.addAll(perimeterPoints);
+		for(Point surroundingPoint : perimeterPoints) {
+			if(surroundingPoint.x<0 || surroundingPoint.y<0) {
+				perimeterPointsCopy.remove(surroundingPoint);
+			}
+		}
+		
+		return perimeterPointsCopy;
 	}
 	
-	Hitbox(Point2D.Double lowerCorner, Point dimensions) { //dimensions MUST map to an integer
+	Hitbox(Point lowerCorner, Point dimensions) { //dimensions MUST map to an integer
 		this.lowerLeft  = lowerCorner;
-		this.lowerRight = new Point2D.Double(lowerCorner.getX()+dimensions.getX(),lowerCorner.getY());
-		this.upperLeft  = new Point2D.Double(lowerCorner.getX(),lowerCorner.getY()+dimensions.getY());
-		this.upperRight = new Point2D.Double(lowerCorner.getX()+dimensions.getX(),lowerCorner.getY()+dimensions.getY());
+		this.lowerRight = new Point(lowerCorner.x+dimensions.x,lowerCorner.y);
+		this.upperLeft  = new Point(lowerCorner.x,lowerCorner.y+dimensions.y);
+		this.upperRight = new Point(lowerCorner.x+dimensions.x,lowerCorner.y+dimensions.y);
+		this.dimensions = dimensions;
 	}
 }

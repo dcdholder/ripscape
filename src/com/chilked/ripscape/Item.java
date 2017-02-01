@@ -10,7 +10,7 @@ import org.yaml.snakeyaml.Yaml;
 public class Item {
 	protected final ItemType itemType;
 	
-	final static String MISC_ITEM_YAML = "misc_item.yaml";
+	final static String MISC_ITEM_YAML = "items.yaml";
 	private static final Map<String,ItemType> allMiscItemTypes = new HashMap<String,ItemType>();
 	
 	int num;

@@ -8,6 +8,8 @@ class Inventory {
 	private final int capacity;
 	Item[] items;
 	
+	int getCapacity() { return capacity; }
+	
 	void add(Item newItem) {
 		for(int i=0; i<capacity; i++) {
 			if(items[i]==null) {

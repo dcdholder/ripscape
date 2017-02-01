@@ -9,8 +9,7 @@ import com.chilked.ripscape.Globe.GlobalAddress;
 public class PC {
 	private static int PC_CAPACITY = 28;	
 	
-	float moveSpeed;
-	boolean moving;
+	String name;
 	
 	Skillset  skillset  = new Skillset();
 	Inventory inventory = new Inventory(PC_CAPACITY);
@@ -139,20 +138,12 @@ public class PC {
 			inventory.add(oldWeapon);
 		}
 	}
-	public void discreteMove(Direction direction) { //keyboard arrow keys
-		Point destinationLowerCorner;
-		
-		if(!moving) {
-			switch(direction) {
-				case up:
-					destinationLowerCorner = new Point(hitbox.lowerLeft.getX(),);
-				case down:
-					destinationLowerCorner = new Point();
-				case left:
-					destinationLowerCorner = new Point();
-				case right:
-					destinationLowerCorner = new Point();
-			}
-		}
+	
+	PC() {
+		this("Adventurer");
+	}
+	
+	PC(String name) {
+		this.name = name;
 	}
 }

@@ -21,7 +21,111 @@ public class Globe {
 
 	private Room[] rooms;
 	
-	public enum Direction { up, down, right, left; }
+	public enum Direction { 
+		up, down, right, left,
+		upRight, upLeft, downRight, downLeft;
+	
+		public boolean isGridwise() {
+			if(this==up || this==down) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+		
+		public boolean isDiagonal() {
+			return !isGridwise();
+		}
+		
+		public List<Direction> divideUpDiagonal() {
+			List<Direction> directions = new ArrayList<Direction>();
+			
+			switch(this) {
+				case upRight:
+					directions.add(up);
+					directions.add(right);
+					break;
+				case upLeft:
+					directions.add(up);
+					directions.add(left);
+					break;
+				case downRight:
+					directions.add(down);
+					directions.add(right);
+					break;
+				case downLeft:
+					directions.add(down);
+					directions.add(left);
+					break;
+				default:
+					throw new IllegalArgumentException("This is not a diagonal direction.");
+			}
+			
+			return directions;
+		}
+		
+		public Point getPointFromCardinalDirection(Point pointA) {
+			switch(this) {
+				case up:
+					return new Point(pointA.x,pointA.y+1);
+				case down:
+					return new Point(pointA.x,pointA.y-1);
+				case left:
+					return new Point(pointA.x+1,pointA.y);
+				case right:
+					return new Point(pointA.x-1,pointA.y);
+				default:
+					throw new IllegalArgumentException("This is not a cardinal direction.");
+			}
+		}
+		
+		static public Direction getDirectionFromAdjacentPoints(Point pointA, Point pointB) {
+			Direction returnDirection = null;
+			
+			int xDiff = pointB.x-pointA.x;
+			int yDiff = pointB.y-pointA.y;
+			
+			if(xDiff==0&&yDiff==0) {
+				throw new IllegalArgumentException("Both points are the same.");
+			}
+			
+			if(xDiff>1 || xDiff<-1 || yDiff>1 || yDiff<-1) {
+				throw new IllegalArgumentException("Points are not adjacent.");
+			}
+			
+			switch(xDiff) {
+				case 0:
+					switch(yDiff) {
+						case 1:  return up;
+						case -1: return down;
+					}
+				case 1:
+					switch(yDiff) {
+						case 0:  return left;
+						case 1:  return upLeft;
+						case -1: return downLeft;
+					}
+				case -1:
+					switch(yDiff) {
+						case 0:  return right;
+						case 1:  return upRight;
+						case -1: return downRight;
+					}
+			}
+		
+			return returnDirection;
+		}
+		
+		static public List<Direction> getDirectionsFromPath(ArrayList<Point> points) {
+			List<Direction> directions = new ArrayList<Direction>();
+			
+			for(int i=0;i<points.size()-1;i++) {
+				directions.add(getDirectionFromAdjacentPoints(points.get(i), points.get(i+1)));
+			}
+			
+			return directions;
+		}
+	}
 	
 	public static class GlobalAddress {
 		String roomName;
@@ -148,203 +252,234 @@ public class Globe {
 					}
 				}
 				
-				static class Node {
-					Node  parentNode;
-					Point thisPoint;
-					Point destPoint;
+				TileType getTileType() { return tileType; }
+				
+				Tile(TileType tileType, List<Item> items) {
+					this.tileType = tileType;
+					this.items    = items;
+				}
+			}
+				
+			class TileNode {
+				TileNode  parentNode;
+				Point thisPoint;
+				Point destPoint;
 
-					double costFromSource;
-					double furtherDistanceEstimate;
-					
-					double totalCost() {
-						return costFromSource + furtherDistanceEstimate;
+				double costFromSource;
+				double furtherDistanceEstimate;
+				
+				double totalCost() {
+					return costFromSource + furtherDistanceEstimate;
+				}
+
+				double beelineDistance(Point pointA, Point pointB) {
+					if(pointA.equals(pointB)) {
+						return 0.0;
 					}
-
-					double beelineDistance(Point pointA, Point pointB) {
-						if(pointA.equals(pointB)) {
-							return 0.0;
-						}
-					
-						if(pointA.x==pointB.x) {
-							return abs(pointB.x-pointA.x);
-						} else if(pointA.y==pointB.y) {
-							return abs(pointB.y-pointA.y);
+				
+					if(pointA.x==pointB.x) {
+						return Math.abs(pointB.x-pointA.x);
+					} else if(pointA.y==pointB.y) {
+						return Math.abs(pointB.y-pointA.y);
+					} else {
+						double diagonalDistance;
+						double horizontalDistance;
+				
+						if(Math.abs(pointB.x-pointA.x)<Math.abs(pointB.y-pointA.y)) {
+							diagonalDistance   = Math.abs(pointB.x-pointA.x)*Math.sqrt(2.0);
+							horizontalDistance = Math.abs(pointB.y-pointA.y) - Math.abs(pointB.x-pointA.x);
 						} else {
-							double diagonalDistance;
-							double horizontalDistance;
+							diagonalDistance   = Math.abs(pointB.y-pointA.y)*Math.sqrt(2.0);
+							horizontalDistance = Math.abs(pointB.x-pointA.x) - Math.abs(pointB.y-pointA.y);
+						}
 					
-							if(abs(pointB.x-pointA.x)<abs(pointB.y-pointA.y)) {
-								diagonalDistance   = abs(pointB.x-pointA.x)*Math.sqrt(2.0);
-								horizontalDistance = abs(pointB.y-pointA.y) - abs(pointB.x-pointA.x);
-							} else {
-								diagonalDistance   = abs(pointB.y-pointA.y)*Math.sqrt(2.0);
-								horizontalDistance = abs(pointB.x-pointA.x) - abs(pointB.y-pointA.y);
+						return diagonalDistance + horizontalDistance;
+					}
+				}
+
+				//note that diagonal movement is only an option when three squares are clear
+				ArrayList<Point> getPathToSquare(Point initialPoint, Point finalPoint) {
+					TileNode initialNode = new TileNode(null,initialPoint,finalPoint,0.0);
+				
+					return initialNode.getPathToSquareInternal(new ArrayList<TileNode>(),new ArrayList<TileNode>());
+				}
+
+				//run this from a node object
+				ArrayList<Point> getPathToSquareInternal(List<TileNode> closedNodes, List<TileNode> openNodes) {
+					List<Point> visitableAdjacentSquares = getVisitableAdjacentSquares(thisPoint);
+
+					//add to the list of closed points, remove from list of open points
+					closedNodes.add(this);
+				
+					if(openNodes.size()!=0) {
+						openNodes.remove(this);
+					}
+				
+					//if there are any visitable adjacent squares not in the open list, add them
+					for(Point adjacentPoint : visitableAdjacentSquares) {
+						boolean matchFound = false;
+						for(TileNode openNode : openNodes) {
+							if(openNode.thisPoint.equals(adjacentPoint)) {
+								matchFound = true;
+								break;
 							}
-						
-							return diagonalDistance + horizontalDistance;
+						}
+						if(!matchFound) {
+							openNodes.add(new TileNode(this,adjacentPoint,this.destPoint,costFromSource+beelineDistance(thisPoint,adjacentPoint)));
 						}
 					}
-
-					//note that diagonal movement is only an option when three squares are clear
-					List<Point> getPathToSquare(Point initialPoint, Point finalPoint) {
-						Node initialNode = new Node(null,initialPoint,finalPoint,0.0);
-					
-						return initialNode.getPathToSquareInternal(new List<Node>(),new List<Node>());
-					}
-
-					//run this from a node object
-					List<Point> getPathToSquareInternal(List<Node> closedNodes, List<Node> openNodes) {
-						List<Point> visitableAdjacentSquares = visitableAdjacentSquares(thisPoint);
-
-						//add to the list of closed points, remove from list of open points
-						closedNodes.add(this);
-					
-						if(openNodes.size()!=0) {
-							openNodes.remove(this);
-						}
-					
-						//if there are any visitable adjacent squares not in the open list, add them
-						for(Point adjacentPoint : visitableAdjacentSquares) {
-							matchFound = false;
-							for(Node openNode : openNodes) {
-								if(openNode.matchesPoint(adjacentPoint)) {
-									matchFound = true;
-									break;
-								}
-							}
-							if(!matchFound) {
-								openNodes.add(new Node(this,adjacentPoint,finalPoint,costFromSource+beelineDistance(thisPoint,adjacentPoint)));
-							}
-						}
-					
-						//if we were not able to add open nodes in this call, and the openNodes list is empty...
+				
+					//if we were not able to add open nodes in this call, and the openNodes list is empty...
+					if(openNodes.size()==0 && !thisPoint.equals(destPoint)) {
 						throw new IllegalStateException("Could not find an open path to the destination");
-					
-						//now search the open points list for the most promising lead, and take it
-						Node    cheapestNode;
-						double  smallestCost;
-						boolean firstIteration = true;
-						for(Node openNode : openNodes) {
+					}
+						
+					//now search the open points list for the most promising lead, and take it
+					TileNode cheapestNode = null;
+					if(openNodes.size()!=0) {
+						double   smallestCost   = 10000.0;
+						boolean  firstIteration = true;
+						for(TileNode openNode : openNodes) {
 							if(openNode.totalCost()<smallestCost || firstIteration) {
 								cheapestNode = openNode;
 								smallestCost = openNode.totalCost();
 							}
 							firstIteration = false;
 						}
+					}
 					
-						if(thisPoint.equals(destPoint) && cheapestNode.totalCost()>=this.totalCost()) {
-							List<Point> path = new ArrayList<Point>();
-							//reverse through parent nodes until you reach the node with a null parent
-							Node checkNode = this;
-							while(checkNode.parentNode!=null) {
-								path.add(checkNode.thisPoint);
-								checkNode = checkNode.parentNode;
-							}
+					
+					
+					if(thisPoint.equals(destPoint) && (cheapestNode.totalCost()>=this.totalCost() || cheapestNode==null)) {
+						ArrayList<Point> path = new ArrayList<Point>();
+						//reverse through parent nodes until you reach the node with a null parent
+						TileNode checkNode = this;
+						while(checkNode.parentNode!=null) {
 							path.add(checkNode.thisPoint);
-						
-							return path;
-						} else {
-							//one recursion for every checked node - possiblity for stack overflow?
-							return cheapestNode.getPathToSquareInternal(closedNodes,openNodes);
+							checkNode = checkNode.parentNode;
 						}
-					}
+						path.add(checkNode.thisPoint);
 					
-					void moveInDirection(Direction direction) {
-						moving = true;
-					}
-
-					void moveToSquare(Point finalSquare) {
-						List<Point>     path       = getPathToSquare(this.location,finalPoint);
-						List<Direction> directions = Direction.getDirectionsFromPath(path);
-					
-						for(int i=0; i<directions.size(); i++) {
-							moveInDirection(directions.get(i));
-						}
-					}
-
-					boolean singleSquareMovementPossible(Point pointA, Point pointB) {
-						List<Point> passThroughPoints = getPassThroughPoints(pointA, pointB);
-					
-						boolean passable = true;
-						for(Point passThroughPoint : passThroughPoints) {
-							if(!tileMap.passable(passThroughPoint)) {
-								passable = false;
-							}
-						}
-					
-						return passable;
-					}
-
-					List<Point> getVisitableAdjacentSquares(Point pointA) {
-						List<Point> adjacentSquares  = getAdjacentSquares(pointA);
-						List<Point> visitableSquares = new ArrayList<Point>();
-					
-						for(Point adjacentSquare : adjacentSquares) {
-							if(singleSquareMovementPossible(pointA,adjacentSquare)) {
-								visitableSquares.add(adjacentSquare);
-							}
-						}
-					
-						return visitableSquares();
-					}
-
-					List<Point> getAdjacentSquares(Point pointA) {
-						List<Point> adjacentSquares = new ArrayList<Point>();
-					
-						adjacentSquares.add(new Point(pointA.x+1,pointA.y));
-						adjacentSquares.add(new Point(pointA.x-1,pointA.y));
-						adjacentSquares.add(new Point(pointA.x,pointA.y+1));
-						adjacentSquares.add(new Point(pointA.x,pointA.y-1));
-					
-						return adjacentSquares;
-					}
-
-					List<Point> getPassThroughPoints(Point pointA, Point pointB) {
-						List<Point> passThroughPoints = new ArrayList<Point>();
-					
-						direction = Direction.getDirectionFromAdjacentPoints(pointA,pointB);
-					
-						if(direction.isGridwise()) {
-							return pointB;
-						} else if(direction.isDiagonal()) {
-							return direction.divideUpDiagonal();
-						}
-					}
-
-					List<Direction> getPathToPerimeter(Point initialPoint) {
-						boolean         foundSmallerPath = false;
-						List<Direction> smallestPath;
-						double          smallestPathLength = 10000.0; //this is the cutoff - paths must be shorter than this to be found
-
-						for(Point point : getPerimeter()) {
-							List<Direction> path = getPathToSquare;
-							double          pathLength = pathLength(path);
-						
-							if(pathLength<smallestPathLength) {
-								foundSmallerPath   = true;
-								smallestPath       = path;
-								smallestPathLength = pathLength;
-							}
-						}
-					
-						if(!foundSmallerPath) {
-							IllegalStateException("No path found.");
-						}
-					}
-
-					Node(Node parentNode, Point thisPoint, Point destPoint, double costFromSource) {
-						this.thisPoint               = thisPoint;
-						this.destPoint               = destPoint;
-						this.costFromSource          = costFromSource;
-						this.furtherDistanceEstimate = beelineDistance(thisPoint,destPoint);
+						return path;
+					} else {
+						//one recursion for every checked node - possiblity for stack overflow?
+						return cheapestNode.getPathToSquareInternal(closedNodes,openNodes);
 					}
 				}
 				
-				TileType getTileType() { return tileType; }
+				/*void moveInDirection(Direction direction) {
+					moving = true;
+				} */
+
+				/*
+				void moveToSquare(Point finalSquare) {
+					List<Point>     path       = getPathToSquare(this.location,finalPoint);
+					List<Direction> directions = Direction.getDirectionsFromPath(path);
 				
-				Tile(TileType tileType, List<Item> items) {
-					this.tileType = tileType;
-					this.items    = items;
+					for(int i=0; i<directions.size(); i++) {
+						moveInDirection(directions.get(i));
+					}
+				}
+				*/
+
+				boolean singleSquareMovementPossible(Point pointA, Point pointB) {
+					List<Point> passThroughPoints = getPassThroughPoints(pointA, pointB);
+				
+					boolean passable = true;
+					for(Point passThroughPoint : passThroughPoints) {
+						if(!passable(passThroughPoint)) {
+							passable = false;
+						}
+					}
+				
+					return passable;
+				}
+
+				List<Point> getVisitableAdjacentSquares(Point pointA) {
+					List<Point> adjacentSquares  = getAdjacentSquares(pointA);
+					List<Point> visitableSquares = new ArrayList<Point>();
+				
+					for(Point adjacentSquare : adjacentSquares) {
+						if(singleSquareMovementPossible(pointA,adjacentSquare)) {
+							visitableSquares.add(adjacentSquare);
+						}
+					}
+				
+					return visitableSquares;
+				}
+
+				List<Point> getAdjacentSquares(Point pointA) {
+					List<Point> adjacentSquares = new ArrayList<Point>();
+				
+					adjacentSquares.add(new Point(pointA.x+1,pointA.y));
+					adjacentSquares.add(new Point(pointA.x-1,pointA.y));
+					adjacentSquares.add(new Point(pointA.x,pointA.y+1));
+					adjacentSquares.add(new Point(pointA.x,pointA.y-1));
+				
+					return adjacentSquares;
+				}
+
+				List<Point> getPassThroughPoints(Point pointA, Point pointB) {
+					List<Point> passThroughPoints = new ArrayList<Point>();
+				
+					Direction direction = Direction.getDirectionFromAdjacentPoints(pointA,pointB);
+				
+					if(direction.isGridwise()) {
+						passThroughPoints.add(pointB);
+					} else if(direction.isDiagonal()) {
+						List<Direction> directions = direction.divideUpDiagonal();
+						
+						for(Direction cardinalDirection : directions) {
+							passThroughPoints.add(cardinalDirection.getPointFromCardinalDirection(pointA));
+						}
+					}
+					
+					return passThroughPoints;
+				}
+
+				double pathLength(ArrayList<Point> path) {
+					List<Direction> directions = Direction.getDirectionsFromPath(path);
+					
+					double total = 0.0;
+					for(Direction direction : directions) {
+						if(direction.isGridwise()) {
+							total+=1.0;
+						} else if(direction.isDiagonal()) {
+							total+=Math.sqrt(2.0);
+						}
+					}
+					
+					return total;
+				}
+				
+				List<Point> getPathToPerimeter(Hitbox hitbox, Point initialPoint) {
+					boolean     foundSmallerPath   = false;
+					List<Point> smallestPath       = null;
+					double      smallestPathLength = 10000.0; //this is the cutoff - paths must be shorter than this to be found
+
+					for(Point point : hitbox.getPerimeter()) {
+						ArrayList<Point> path       = getPathToSquare(initialPoint,point);
+						double           pathLength = pathLength(path);
+					
+						if(pathLength<smallestPathLength) {
+							foundSmallerPath   = true;
+							smallestPath       = path;
+							smallestPathLength = pathLength;
+						}
+					}
+				
+					if(!foundSmallerPath || smallestPath==null) {
+						throw new IllegalStateException("No path found.");
+					}
+					
+					return smallestPath;
+				}
+
+				TileNode(TileNode parentNode, Point thisPoint, Point destPoint, double costFromSource) {
+					this.thisPoint               = thisPoint;
+					this.destPoint               = destPoint;
+					this.costFromSource          = costFromSource;
+					this.furtherDistanceEstimate = beelineDistance(thisPoint,destPoint);
 				}
 			}
 			
@@ -560,6 +695,10 @@ public class Globe {
 			}
 		}
 		
+		private TileMap loadTileMap(String[] asciiMap) {
+			return null; //TODO: make this actually do something
+		}
+		
 		private Portal[] loadPortals(String[] asciiMap) {
 			return null; //TODO: make this actually do something
 		}
@@ -575,6 +714,7 @@ public class Globe {
 			this.name          = name;
 			this.roomFilename  = roomFilename;
 			this.asciiMap      = roomBuilder.loadRoomText();
+			this.tileMap       = loadTileMap(asciiMap);
 			this.portals       = loadPortals(asciiMap);
 			this.worldObjects  = loadWorldObjects(asciiMap);
 			//TODO: how are the other fields derived from these
