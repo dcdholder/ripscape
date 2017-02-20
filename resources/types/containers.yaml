@@ -1,5 +1,6 @@
 - name:          Crate
   imageFilename: crate.png
+  character:     
   width:         1
   height:        1
   stackable:     true
