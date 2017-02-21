@@ -177,8 +177,10 @@ public class Globe {
 			Tile[][] map;
 			
 			static class Tile {
-				TileType   tileType;
-				List<Item> items; //dropped items
+				TileType    tileType;
+				WorldObject worldObject;
+				Portal      portal;
+				List<Item>  items; //dropped items
 				
 				static class TileType {
 					final static String TILE_YAML = "tile.yaml";
@@ -236,9 +238,11 @@ public class Globe {
 				
 				TileType getTileType() { return tileType; }
 				
-				Tile(TileType tileType, List<Item> items) {
-					this.tileType = tileType;
-					this.items    = items;
+				Tile(TileType tileType, WorldObject worldObject, Portal portal, List<Item> items) {
+					this.tileType    = tileType;
+					this.worldObject = worldObject;
+					this.portal      = portal;
+					this.items       = items;
 				}
 			}
 				
@@ -686,6 +690,8 @@ public class Globe {
 		}
 		
 		private WorldObject[] loadWorldObjects(String[] asciiMap) {
+			
+			
 			return null; //TODO: make this actually do something
 		}
 		
